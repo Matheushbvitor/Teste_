@@ -32,7 +32,6 @@
     .btn:active{ transform:scale(.98) } .btn:hover{ filter:brightness(1.06) }
     .yes{ background:#4CAF50; color:#fff } .no{ background:#f44336; color:#fff } .why{ background:#ff9800; color:#fff; position:relative; overflow:visible }
 
-    /* === Destaque criativo para o botão "Por que..." === */
     .why.attn{
       animation: why-pulse 1.4s ease-in-out infinite;
       box-shadow: 0 0 0 0 rgba(255,152,0,.55);
@@ -77,7 +76,6 @@
     .dialog-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); justify-content:center; align-items:center; padding:16px; }
     .dialog-box{ width:min(360px,92vw); background:rgba(255,255,255,.96); border-radius:12px; padding:20px; text-align:center; box-shadow:0 12px 36px rgba(0,0,0,.35); backdrop-filter:blur(2px); }
     .dialog-box p{ margin:0 0 16px; font-size:18px; color:#333 } .dialog-buttons{ display:flex; gap:12px; } .dialog-buttons button{ flex:1; padding:10px 0; border:none; border-radius:8px; font-size:16px; cursor:pointer }
-
     @keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
     .shaking{ animation:shake .3s }
 
@@ -132,6 +130,35 @@
       .fx-wipe.out,.fx-flip.out{ animation:none !important }
     }
   </style>
+
+  <!-- 🔔 PING DE ACESSO PARA GOOGLE APPS SCRIPT (pixel + fallback) -->
+  <script>
+    (function(){
+      const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzvuy4PC0wPGH2d9s_qCfRxHVhqt2RvEzv_rS1caNfuiLAmjVwYVe7n_1wSl6hb9vE/exec";
+
+      function pingByImage(){
+        try{
+          const img = new Image();
+          img.referrerPolicy = "no-referrer";
+          img.src = WEBAPP_URL + "?cb=" + Date.now().toString(36);
+        }catch(e){}
+      }
+      function pingOnHide(){
+        try{
+          const blob = new Blob([JSON.stringify({cb: Date.now()})], {type:"application/json"});
+          if (navigator.sendBeacon) navigator.sendBeacon(WEBAPP_URL, blob);
+        }catch(e){}
+      }
+
+      // Dispara cedo e repete em momentos diferentes
+      pingByImage(); // imediato
+      document.addEventListener("DOMContentLoaded", pingByImage, {once:true});
+      window.addEventListener("load", () => setTimeout(pingByImage, 300), {once:true});
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") pingOnHide();
+      });
+    })();
+  </script>
 </head>
 <body>
   <div class="card">
@@ -173,119 +200,6 @@
   <audio id="sadsong-audio" preload="auto" playsinline>
     <source src="sadsong.mp3" type="audio/mpeg">
   </audio>
-
-  <!-- 🔔 PING DE ACESSO PARA GOOGLE APPS SCRIPT (versão resiliente) -->
-  <script>
-  (function () {
-    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzvuy4PC0wPGH2d9s_qCfRxHVhqt2RvEzv_rS1caNfuiLAmjVwYVe7n_1wSl6hb9vE/exec";
-
-    function enc(v){ return encodeURIComponent(v ?? "-"); }
-    function qs() {
-      const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "");
-      const cb = Date.now().toString(36) + Math.random().toString(36).slice(2);
-      return "url=" + enc(location.href) +
-             "&ref=" + enc(document.referrer) +
-             "&ua="  + enc(navigator.userAgent) +
-             "&tz="  + enc(tz) +
-             "&cb="  + enc(cb);
-    }
-
-    function fireIMG(){
-      try { const i=new Image(); i.referrerPolicy="no-referrer"; i.src=WEBAPP_URL+"?"+qs(); } catch(e){}
-    }
-    function fireIFRAME(){
-      try {
-        const f=document.createElement("iframe");
-        f.src=WEBAPP_URL+"?"+qs();
-        f.style.cssText="position:absolute;left:-9999px;top:0;width:0;height:0;border:0;";
-        f.setAttribute("aria-hidden","true");
-        document.body.appendChild(f);
-        setTimeout(()=>{ try{ f.remove(); }catch(_){} }, 8000);
-      } catch(e){}
-    }
-    function fireSCRIPT(){
-      try{
-        const s=document.createElement("script");
-        s.src=WEBAPP_URL+"?"+qs();
-        s.async=true; s.defer=true; s.referrerPolicy="no-referrer";
-        s.onload=s.onerror=()=>{ try{ s.remove(); }catch(_){} };
-        document.head.appendChild(s);
-      }catch(e){}
-    }
-    function fireOBJECT(){
-      try{
-        const o=document.createElement("object");
-        o.data=WEBAPP_URL+"?"+qs();
-        o.type="text/html";
-        o.width=0; o.height=0; o.style.cssText="position:absolute;left:-9999px;";
-        document.body.appendChild(o);
-        setTimeout(()=>{ try{ o.remove(); }catch(_){} },8000);
-      }catch(e){}
-    }
-    function fireEMBED(){
-      try{
-        const e=document.createElement("embed");
-        e.src=WEBAPP_URL+"?"+qs();
-        e.type="text/html";
-        e.width=0; e.height=0; e.style.cssText="position:absolute;left:-9999px;";
-        document.body.appendChild(e);
-        setTimeout(()=>{ try{ e.remove(); }catch(_){} },8000);
-      }catch(e){}
-    }
-    function firePOST(){
-      try{
-        const payload={
-          url: location.href,
-          ref: document.referrer || "-",
-          ua : navigator.userAgent || "-",
-          tz : Intl.DateTimeFormat().resolvedOptions().timeZone || "",
-          cb : Date.now()
-        };
-        const blob=new Blob([JSON.stringify(payload)],{type:"application/json"});
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon(WEBAPP_URL, blob);
-        } else {
-          fetch(WEBAPP_URL, {
-            method:"POST", mode:"no-cors",
-            headers:{ "Content-Type":"application/json" },
-            body: JSON.stringify(payload)
-          }).catch(()=>{});
-        }
-      }catch(e){}
-    }
-
-    function fireAll(){
-      fireIMG();
-      fireSCRIPT();
-      if (document.body) {
-        fireIFRAME();
-        fireOBJECT();
-        fireEMBED();
-      } else {
-        document.addEventListener("DOMContentLoaded", () => {
-          fireIFRAME(); fireOBJECT(); fireEMBED();
-        }, {once:true});
-      }
-      firePOST();
-    }
-
-    // tentativas em vários momentos
-    fireAll();                                                  // imediato
-    document.addEventListener("DOMContentLoaded", fireAll, {once:true});
-    window.addEventListener("load", () => setTimeout(fireAll, 300), {once:true});
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") firePOST();   // ao sair da aba
-    });
-    setTimeout(fireAll, 2000);                                  // reforço
-    setTimeout(fireAll, 5000);                                  // reforço
-
-  })();
-  </script>
-
-  <!-- Fallback sem JS: tenta GET via imagem -->
-  <noscript>
-    <img src="https://script.google.com/macros/s/AKfycbzvuy4PC0wPGH2d9s_qCfRxHVhqt2RvEzv_rS1caNfuiLAmjVwYVe7n_1wSl6hb9vE/exec?url=noscript&ref=-&ua=noscript&tz=-&cb=1" alt="" style="display:none" />
-  </noscript>
 
   <script>
     /* ===== Música de fundo (kennyg) ===== */
@@ -610,6 +524,7 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
     /* ===== Inicialização ===== */
     const CYCLE_MS = 4000;
     window.addEventListener('load', ()=>{
+      // nudges periódicos para o botão "Por que..."
       const why = document.getElementById('whyBtn');
       setInterval(()=>{ if(why) { why.classList.add('wiggle'); setTimeout(()=>why.classList.remove('wiggle'), 600); } }, 5200);
 
@@ -629,7 +544,7 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
         }
       });
 
-      setupAutoplay();
+      setupAutoplay(); // tenta iniciar kennyg automaticamente
     });
   </script>
 </body>
