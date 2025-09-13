@@ -33,46 +33,21 @@
     .yes{ background:#4CAF50; color:#fff } .no{ background:#f44336; color:#fff } .why{ background:#ff9800; color:#fff; position:relative; overflow:visible }
 
     /* === Destaque criativo para o botão "Por que..." === */
-    .why.attn{
-      animation: why-pulse 1.4s ease-in-out infinite;
-      box-shadow: 0 0 0 0 rgba(255,152,0,.55);
-    }
+    .why.attn{ animation: why-pulse 1.4s ease-in-out infinite; box-shadow: 0 0 0 0 rgba(255,152,0,.55); }
     .why.attn::before{
-      content:"";
-      position:absolute; inset:-6px;
-      border-radius:12px;
+      content:""; position:absolute; inset:-6px; border-radius:12px;
       background: radial-gradient(closest-side, rgba(255,184,77,.45), rgba(255,184,77,0) 70%);
-      filter: blur(8px); opacity:.75; pointer-events:none;
-      animation: glow 2.2s ease-in-out infinite;
+      filter: blur(8px); opacity:.75; pointer-events:none; animation: glow 2.2s ease-in-out infinite;
     }
     .why.attn::after{
-      /* mão invertida apontando para o botão e um pouco mais distante */
-      content:"👈";
-      position:absolute; right:-36px; top:50%;
-      transform:translateY(-50%) rotate(10deg);
-      font-size:22px; text-shadow:0 2px 6px rgba(0,0,0,.35);
-      animation: point-left 1s ease-in-out infinite;
-      pointer-events:none;
+      content:"👈"; position:absolute; right:-36px; top:50%; transform:translateY(-50%) rotate(10deg);
+      font-size:22px; text-shadow:0 2px 6px rgba(0,0,0,.35); animation: point-left 1s ease-in-out infinite; pointer-events:none;
     }
-    @keyframes why-pulse{
-      0%{ transform:scale(1); box-shadow:0 0 0 0 rgba(255,152,0,.55) }
-      70%{ transform:scale(1.04); box-shadow:0 0 0 14px rgba(255,152,0,0) }
-      100%{ transform:scale(1) }
-    }
+    @keyframes why-pulse{ 0%{ transform:scale(1); box-shadow:0 0 0 0 rgba(255,152,0,.55) } 70%{ transform:scale(1.04); box-shadow:0 0 0 14px rgba(255,152,0,0) } 100%{ transform:scale(1) } }
     @keyframes glow{ 0%,100%{opacity:.55} 50%{opacity:.85} }
-    @keyframes point-left{
-      0%,100%{ transform:translateY(-50%) rotate(10deg) }
-      50%{ transform:translate(-6px,-50%) rotate(-8deg) }
-    }
-    /* "Nudges" periódicos (um balancinho curto) */
+    @keyframes point-left{ 0%,100%{ transform:translateY(-50%) rotate(10deg) } 50%{ transform:translate(-6px,-50%) rotate(-8deg) } }
     .why.wiggle{ animation: wiggle 0.6s ease }
-    @keyframes wiggle{
-      0%{ transform:translateY(0) rotate(0) }
-      25%{ transform:translateY(-1px) rotate(-2deg) }
-      50%{ transform:translateY(0) rotate(0) }
-      75%{ transform:translateY(1px) rotate(2deg) }
-      100%{ transform:translateY(0) rotate(0) }
-    }
+    @keyframes wiggle{ 0%{ transform:translateY(0) rotate(0) } 25%{ transform:translateY(-1px) rotate(-2deg) } 50%{ transform:translateY(0) rotate(0) } 75%{ transform:translateY(1px) rotate(2deg) } 100%{ transform:translateY(0) rotate(0) } }
 
     .btn .emo{ margin-left:.35em; display:inline-block; transform:translateY(1px) }
 
@@ -118,12 +93,11 @@
     .fx-wipe.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
     @keyframes wipe-in{from{clip-path:inset(0 100% 0 0);transform:translateY(4px);opacity:.0}to{clip-path:inset(0 0 0 0);transform:translateY(0);opacity:1}}
     @keyframes wipe-out{from{clip-path:inset(0 0 0 0);opacity:1}to{clip-path:inset(0 100% 0 0);opacity:0}}
+
     .fx-flip .text{ transform-origin:left center; will-change:transform,opacity; }
     .fx-flip.in  .text{ animation:flip-in 520ms calc(var(--d,0ms) + 90ms) cubic-bezier(.2,.8,.2,1) both; }
     .fx-flip.out .text{ animation:flip-out 300ms var(--d,0ms) ease-in both; }
     .fx-flip.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
-    @keyframes flip-in{from{transform:rotateX(-75deg);opacity:0;filter:blur(2px)}to{transform:rotateX(0);opacity:1;filter:blur(0)}}
-    @keyframes flip-out{from{transform:rotateX(0);opacity:1}to{transform:rotateX(60deg);opacity:0}}
 
     @media (prefers-reduced-motion: reduce){
       .why.attn,.why.wiggle{ animation:none !important }
@@ -175,13 +149,13 @@
     <source src="sadsong.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- 🔔 PING DE ACESSO (Google Apps Script) -->
+  <!-- 🔔 PING DE ACESSO PARA GOOGLE APPS SCRIPT -->
   <script>
     (function () {
-      const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwyFLApMxNoP_IGXdZ-1OQDvNQ93XTivICzQvrWKMXviikUNeHBz3TgnvS0upcde0w/exec";
-      function enc(v){ return encodeURIComponent(v || "-"); }
+      // sua URL /exec já publicada para "Anyone"
+      const WEBAPP_URL = "https://script.google.com/macros/u/1/s/AKfycbzvuy4PC0wPGH2d9s_qCfRxHVhqt2RvEzv_rS1caNfuiLAmjVwYVe7n_1wSl6hb9vE/exec";
 
-      // Monta a URL com os parâmetros
+      function enc(v){ return encodeURIComponent(v || "-"); }
       const qs = [
         "url=" + enc(location.href),
         "ref=" + enc(document.referrer),
@@ -191,7 +165,7 @@
 
       const fullURL = WEBAPP_URL + "?" + qs;
 
-      // Beacon confiável via <img> (GET) — não depende de CORS
+      // Beacon confiável via <img> (não depende de CORS)
       new Image().src = fullURL;
 
       // Fallback com fetch GET (silencioso)
@@ -208,91 +182,50 @@
 
     async function startBGM() {
       const a = document.getElementById('bgm');
-      if (!a) return false;
-      try {
-        a.volume = 0.6;
-        await a.play();
-        bgmStarted = true;
-        return true;
-      } catch(e) { return false; }
+      try { a.volume = 0.6; await a.play(); bgmStarted = true; return true; } catch(e) { return false; }
     }
-    function playBGMNow(){
-      const a = document.getElementById('bgm');
-      if (!a) return;
-      a.volume = 0.6;
-      a.play().catch(()=>{});
-      bgmStarted = true;
-    }
-    function pauseBGM(){
-      const a = document.getElementById('bgm');
-      if (a && !a.paused) a.pause();
-    }
+    function playBGMNow(){ const a = document.getElementById('bgm'); if (!a) return; a.volume = 0.6; a.play().catch(()=>{}); bgmStarted = true; }
+    function pauseBGM(){ const a = document.getElementById('bgm'); if (a && !a.paused) a.pause(); }
     function setupAutoplay() {
       setTimeout(startBGM, AUTOPLAY_DELAY_MS);
-      document.addEventListener('visibilitychange', ()=>{
-        if (document.visibilityState === 'visible') startBGM();
-      });
+      document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState === 'visible') startBGM(); });
       requestAnimationFrame(startBGM);
       window.addEventListener('pageshow', startBGM);
     }
 
-    /* ===== SadSong em loop no diálogo ===== */
     function playSadLoop(){
       const sad = document.getElementById('sadsong-audio');
-      if (!sad) return;
-      sad.loop = true;
-      sad.volume = 0.5;
+      if (!sad) return; sad.loop = true; sad.volume = 0.5;
       try { sad.currentTime = 0; sad.play().catch(()=>{}); } catch(e){}
     }
     function stopSadLoop(){
       const sad = document.getElementById('sadsong-audio');
-      if (!sad) return;
-      try { sad.pause(); } catch(e){}
-      sad.currentTime = 0;
-      sad.loop = false;
+      if (!sad) return; try { sad.pause(); } catch(e){} sad.currentTime = 0; sad.loop = false;
     }
 
-    /* ===== util para áudios curtos ===== */
     async function playFromElementOrNew(id, src, volume=0.5){
       const el=document.getElementById(id);
       const tryP=async a=>{try{a.volume=volume;a.currentTime=0;await a.play();return true}catch{return false}};
       if(el && await tryP(el)) return true;
-      const dyn=new Audio(src); dyn.preload='auto'; dyn.volume=volume;
-      return await tryP(dyn);
+      const dyn=new Audio(src); dyn.preload='auto'; dyn.volume=volume; return await tryP(dyn);
     }
 
-    /* ===== Botões/diálogo ===== */
     async function aceitou(){
-      pauseBGM();
-      stopSadLoop();
+      pauseBGM(); stopSadLoop();
       await playFromElementOrNew('feliznavida-audio','feliznavida.mp3',0.5);
-      setTimeout(()=>{
-        const msg=encodeURIComponent("Aceitei :)");
-        window.location.href=`https://wa.me/5518996259121?text=${msg}`;
-      },4500);
+      setTimeout(()=>{ const msg=encodeURIComponent("Aceitei :)"); window.location.href=`https://wa.me/5518996259121?text=${msg}`; },4500);
     }
 
-    function abrirPagina(){
-      pauseBGM();
-      stopSadLoop();
-      window.location.href="pagina.html";
-    }
+    function abrirPagina(){ pauseBGM(); stopSadLoop(); window.location.href="pagina.html"; }
 
     function abrirDialogo(){
-      pauseBGM();
-      playSadLoop();     // toca sadsong em loop enquanto o diálogo estiver aberto
-      const c=document.getElementById('dialogButtons'),
-            s=document.getElementById('btnSim'),
-            n=document.getElementById('btnNao');
+      pauseBGM(); playSadLoop();
+      const c=document.getElementById('dialogButtons'), s=document.getElementById('btnSim'), n=document.getElementById('btnNao');
       c.innerHTML=''; c.appendChild(s); c.appendChild(n);
       document.getElementById('dialogo').style.display='flex';
     }
 
-    function fecharDialogo(){
-      document.getElementById('dialogo').style.display='none';
-      stopSadLoop();     // para o loop da triste
-      playBGMNow();      // volta a tocar o kennyg imediatamente
-    }
+    function fecharDialogo(){ document.getElementById('dialogo').style.display='none'; stopSadLoop(); playBGMNow(); }
 
     function tremerETrocar(e){
       e.preventDefault(); e.stopPropagation();
@@ -312,7 +245,6 @@
       requestAnimationFrame(()=>{ el.style.transition='transform 220ms ease'; el.style.transform='translateX(0)'; });
     }
 
-    /* ===== Texto digitando ===== */
     const texto =
 `Acho que tô precisando de terapia… ando com uns sintomas meio suspeitos: coração acelerado, sorriso bobo e uma vontade de te ver todo dia.
 Sinceramente? Tô começando a desconfiar que o diagnóstico é você.
@@ -334,11 +266,9 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
       setTimeout(()=>{ span.style.opacity='0'; setTimeout(()=>{ span.textContent=c; span.style.opacity='1'; index++; setTimeout(digitarSequencial,nextDelayFor(c)); },FADE_DURATION); },REVEAL_DELAY);
     }
 
-    /* ===== Emoji título ===== */
     const emojiList=["🤩","🥰","😍","💖"], emojiEl=document.getElementById("emojiCycler"); let emojiIndex=0;
     function cycleEmoji(){ emojiEl.style.opacity='0'; setTimeout(()=>{ emojiIndex=(emojiIndex+1)%emojiList.length; emojiEl.textContent=emojiList[emojiIndex]; emojiEl.style.opacity='1'; },260); }
 
-    /* ===== Acrônimos ===== */
     const ACRONYM_BLOCK = `
 ---ACRONIMOS_POR_LETRA---
 [M]
@@ -415,13 +345,7 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
       const m=block.match(re); if(!m) return [];
       return m[1].split('\n').map(l=>l.replace(/^\s*-\s*/,'').trim()).filter(Boolean);
     }
-    const GROUPS={
-      M:parseGroup(ACRONYM_BLOCK,'M'),
-      A:parseGroup(ACRONYM_BLOCK,'A'),
-      R:parseGroup(ACRONYM_BLOCK,'R'),
-      I:parseGroup(ACRONYM_BLOCK,'I'),
-      N:parseGroup(ACRONYM_BLOCK,'N')
-    };
+    const GROUPS={ M:parseGroup(ACRONYM_BLOCK,'M'), A:parseGroup(ACRONYM_BLOCK,'A'), R:parseGroup(ACRONYM_BLOCK,'R'), I:parseGroup(ACRONYM_BLOCK,'I'), N:parseGroup(ACRONYM_BLOCK,'N') };
 
     function pickOne(arr,avoid){ const pool=arr.filter(x=>x!==avoid); return pool.length?pool[Math.floor(Math.random()*pool.length)]:(arr[0]||''); }
     function pickDistinctA(aArr,used,avoid){
@@ -477,23 +401,12 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
 
       const currentH=full.offsetHeight || 0;
       const targetH=Math.max(currentH, newH);
-      full.style.height=targetH+'px';
-      full.style.opacity='0';
+      full.style.height=targetH+'px'; full.style.opacity='0';
+      full.innerHTML=''; full.appendChild(wrapper);
 
-      full.innerHTML='';
-      full.appendChild(wrapper);
+      requestAnimationFrame(()=>{ full.style.height=newH+'px'; full.style.opacity='1'; });
 
-      requestAnimationFrame(()=>{
-        full.style.height=newH+'px';
-        full.style.opacity='1';
-      });
-
-      const onEnd=e=>{
-        if(e.propertyName==='height'){
-          full.style.height='auto';
-          full.removeEventListener('transitionend',onEnd);
-        }
-      };
+      const onEnd=e=>{ if(e.propertyName==='height'){ full.style.height='auto'; full.removeEventListener('transitionend',onEnd); } };
       full.addEventListener('transitionend',onEnd);
     }
 
@@ -502,29 +415,15 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
       if(swapBusy) return; swapBusy=true;
       const full=document.getElementById('acronymFull');
       const rows=[...full.querySelectorAll('.row')];
-
-      if(!rows.length){
-        renderFullAcronym(lines);
-        swapBusy=false;
-        return;
-      }
-      rows.forEach((r,i)=>{
-        r.classList.remove('in');
-        r.classList.add('out');
-        r.style.setProperty('--d',`${i*70}ms`);
-      });
+      if(!rows.length){ renderFullAcronym(lines); swapBusy=false; return; }
+      rows.forEach((r,i)=>{ r.classList.remove('in'); r.classList.add('out'); r.style.setProperty('--d',`${i*70}ms`); });
       const outTotal = 320 + (rows.length - 1) * 70 + 60 + EXTRA_GAP_MS;
       setTimeout(()=>{ renderFullAcronym(lines); swapBusy=false; }, outTotal);
     }
-    function nextAcronym(){
-      currentSet=(currentSet+1)%ACRONYM_SETS.length;
-      swapAcronym(ACRONYM_SETS[currentSet]);
-    }
+    function nextAcronym(){ currentSet=(currentSet+1)%ACRONYM_SETS.length; swapAcronym(ACRONYM_SETS[currentSet]); }
 
-    /* ===== Inicialização ===== */
     const CYCLE_MS = 4000;
     window.addEventListener('load', ()=>{
-      // nudges periódicos para o botão "Por que..."
       const why = document.getElementById('whyBtn');
       setInterval(()=>{ if(why) { why.classList.add('wiggle'); setTimeout(()=>why.classList.remove('wiggle'), 600); } }, 5200);
 
@@ -536,15 +435,11 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
 
       let timer=setInterval(nextAcronym, CYCLE_MS);
       document.addEventListener('visibilitychange', ()=>{
-        if(document.visibilityState==='visible'){
-          clearInterval(timer);
-          timer=setInterval(nextAcronym, CYCLE_MS);
-        } else {
-          clearInterval(timer);
-        }
+        if(document.visibilityState==='visible'){ clearInterval(timer); timer=setInterval(nextAcronym, CYCLE_MS); }
+        else { clearInterval(timer); }
       });
 
-      setupAutoplay(); // tenta iniciar kennyg automaticamente
+      setupAutoplay();
     });
   </script>
 </body>
