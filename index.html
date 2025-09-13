@@ -175,33 +175,25 @@
     <source src="sadsong.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- 🔔 PING DE ACESSO: envia e-mail ao abrir a página -->
+  <!-- 🔔 IFTTT: envia e-mail assim que a página abrir -->
   <script>
-    (function () {
-      // 👉 Cole aqui a URL do seu Apps Script após implantar como "Aplicativo da Web"
-      const WEBAPP_URL = "WEBAPP_URL_DO_APPS_SCRIPT"; // ex.: https://script.google.com/macros/s/AKfycb.../exec
-      // Deve bater com o SECRET do Apps Script
-      const SECRET = "mari-visit-SEGREDO-7d7e6c2c9b";
+    (function(){
+      const EVENT = "site_acessado"; // use o MESMO nome criado no IFTTT (Webhooks -> Receive a web request)
+      const KEY   = "pF6F-NIiDy9Zfu21Oty4s3mhcSYgMGXGz5abDFT4_Yt"; // sua key do Webhooks
+      const url   = `https://maker.ifttt.com/trigger/${EVENT}/with/key/${KEY}`;
 
       const payload = {
-        secret: SECRET,
-        path: location.pathname + location.search + location.hash,
-        ref: document.referrer || '',
-        ua: navigator.userAgent || '',
-        tz: (Intl.DateTimeFormat().resolvedOptions().timeZone || ''),
-        t: new Date().toISOString()
+        value1: location.href,
+        value2: document.referrer || "-",
+        value3: navigator.userAgent || "-"
       };
 
-      // Dispara assim que o DOM estiver pronto (antes do restante, para garantir o envio)
-      document.addEventListener('DOMContentLoaded', function () {
-        try {
-          fetch(WEBAPP_URL, {
-            method: 'POST',
-            mode: 'no-cors',                          // evita bloqueio de CORS (não lemos a resposta)
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          }).catch(()=>{});
-        } catch(e) {}
+      document.addEventListener('DOMContentLoaded', () => {
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(()=>{});
       });
     })();
   </script>
