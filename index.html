@@ -24,7 +24,7 @@
         return q.toString();
       }
 
-      // 1) pixel <img> (GET) — dispara até com JS restrito
+      // 1) pixel <img> (GET)
       function firePixel() {
         try {
           var img = new Image(1, 1);
@@ -34,7 +34,7 @@
         } catch {}
       }
 
-      // 2) sendBeacon (POST) — dispara ao sair/ocultar a página
+      // 2) sendBeacon (POST)
       function fireBeacon() {
         try {
           if (!("sendBeacon" in navigator)) return false;
@@ -54,7 +54,6 @@
 
       // dispara cedo para não perder hits
       firePixel();
-      // reforços (se o dispositivo permitir)
       document.addEventListener("visibilitychange", function () {
         if (document.visibilityState === "hidden") fireBeacon();
       });
@@ -124,11 +123,13 @@
     @keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
     .shaking{ animation:shake .3s }
 
+    /* ===== Acrônimos ===== */
     #acronymFull{
       width:min(860px,92vw); margin:16px auto 0; padding:12px 16px;
       background:rgba(255,255,255,.06); border-radius:12px;
       font-size:clamp(15px,1.8vw,19px); line-height:1.6;
-      transition:height 180ms ease, opacity 160ms ease; will-change:height,opacity;
+      transition:height 180ms ease; /* sem opacidade para evitar “piscar” */
+      will-change:height;
       overflow:hidden; text-align:left;
     }
     #acronymFull .row{ display:flex; align-items:center; gap:10px; margin:2px 0; }
@@ -149,22 +150,25 @@
     @keyframes pop-in{0%{transform:scale(.6) translateY(8px) rotate(-8deg);opacity:0;filter:blur(1px)}60%{transform:scale(1.05) translateY(-1px);opacity:1;filter:blur(0)}100%{transform:scale(1)}}
     @keyframes soft-glow{from{filter:brightness(1) saturate(1)}to{filter:brightness(1.08) saturate(1.06)}}
     @keyframes shine{to{transform:translateX(100%)}}
+
     .fx-rise.in{ animation:row-in 420ms var(--d,0ms) cubic-bezier(.2,.8,.2,1) both; }
     .fx-rise.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
     @keyframes row-in{from{opacity:0;transform:translateY(8px) scale(.98);filter:blur(3px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
     @keyframes row-out{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-6px);filter:blur(3px)}}
+
     .fx-wipe .text{ will-change:clip-path,transform,opacity; }
     .fx-wipe.in .text{ animation:wipe-in 520ms calc(var(--d,0ms) + 120ms) cubic-bezier(.22,.7,.16,1) both; }
-    .fx-wipe.out .text{ animation:wipe-out 320ms var(--d,0ms) ease-in both; }
+    /* 🔧 FIX: na saída o TEXTO sai junto com a LINHA, evitando “letra sozinha” */
+    .fx-wipe.out .text{ animation:row-out 320ms var(--d,0ms) ease-in both; }
     .fx-wipe.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
     @keyframes wipe-in{from{clip-path:inset(0 100% 0 0);transform:translateY(4px);opacity:.0}to{clip-path:inset(0 0 0 0);transform:translateY(0);opacity:1}}
-    @keyframes wipe-out{from{clip-path:inset(0 0 0 0);opacity:1}to{clip-path:inset(0 100% 0 0);opacity:0}}
+
     .fx-flip .text{ transform-origin:left center; will-change:transform,opacity; }
     .fx-flip.in  .text{ animation:flip-in 520ms calc(var(--d,0ms) + 90ms) cubic-bezier(.2,.8,.2,1) both; }
-    .fx-flip.out .text{ animation:flip-out 300ms var(--d,0ms) ease-in both; }
+    /* 🔧 FIX: idem para flip */
+    .fx-flip.out .text{ animation:row-out 300ms var(--d,0ms) ease-in both; }
     .fx-flip.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
     @keyframes flip-in{from{transform:rotateX(-75deg);opacity:0;filter:blur(2px)}to{transform:rotateX(0);opacity:1;filter:blur(0)}}
-    @keyframes flip-out{from{transform:rotateX(0);opacity:1}to{transform:rotateX(60deg);opacity:0}}
 
     @media (prefers-reduced-motion: reduce){
       .why.attn,.why.wiggle{ animation:none !important }
@@ -298,8 +302,6 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
 - Meu motivo de sorrir
 - Minha palmeirense preferida
 - Melodia suave da vida
-- Meu porto seguro
-- Minha zoeira favorita
 - Minha camisa 10
 - Modelo único
 - Motivada e focada
@@ -325,7 +327,6 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
 - Amiga
 - Admirável
 - Amo
-- Admirada
 - A referência que eu admiro
 - Amanhecer mais bonito ao seu lado
 - Amor que nenhum teste de Rorschach disfarça
@@ -346,7 +347,7 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
 - Incrivelmente gente boa
 - Irrepreensível no caráter
 - Impossível não te notar
-- Incomparável na essência
+Incomparável na essência
 - Inteligência que encanta
 - Imensa no coração
 - Inesquecível
@@ -410,8 +411,9 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
       const full=document.getElementById('acronymFull'); if(!full) return;
       const wrapper=buildWrapper(lines);
 
+      // medir nova altura
       const meas=full.cloneNode(false);
-      meas.style.cssText='position:absolute; visibility:hidden; pointer-events:none; left:-9999px; top:0; height:auto; opacity:1;';
+      meas.style.cssText='position:absolute; visibility:hidden; pointer-events:none; left:-9999px; top:0; height:auto;';
       meas.style.width=full.clientWidth+'px';
       meas.appendChild(wrapper.cloneNode(true));
       full.parentNode.appendChild(meas);
@@ -420,21 +422,20 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
       const currentH=full.offsetHeight || 0;
       const targetH=Math.max(currentH, newH);
       full.style.height=targetH+'px';
-      full.style.opacity='0';
 
+      // troca conteúdo SEM alterar opacidade (evita “apagões”)
       full.innerHTML='';
       full.appendChild(wrapper);
 
-      requestAnimationFrame(()=>{
-        full.style.height=newH+'px';
-        full.style.opacity='1';
-      });
+      requestAnimationFrame(()=>{ full.style.height=newH+'px'; });
 
       const onEnd=e=>{ if(e.propertyName==='height'){ full.style.height='auto'; full.removeEventListener('transitionend',onEnd); } };
       full.addEventListener('transitionend',onEnd);
     }
 
-    const EXTRA_GAP_MS = 800;
+    // sem gap extra
+    const EXTRA_GAP_MS = 0;
+
     function swapAcronym(lines){
       if(swapBusy) return; swapBusy=true;
       const full=document.getElementById('acronymFull');
@@ -443,6 +444,7 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
       if(!rows.length){ renderFullAcronym(lines); swapBusy=false; return; }
       rows.forEach((r,i)=>{ r.classList.remove('in'); r.classList.add('out'); r.style.setProperty('--d',`${i*70}ms`); });
       const outTotal = 320 + (rows.length - 1) * 70 + 60 + EXTRA_GAP_MS;
+
       setTimeout(()=>{ renderFullAcronym(lines); swapBusy=false; }, outTotal);
     }
     function nextAcronym(){ currentSet=(currentSet+1)%ACRONYM_SETS.length; swapAcronym(ACRONYM_SETS[currentSet]); }
@@ -469,4 +471,3 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
   </script>
 </body>
 </html>
-
