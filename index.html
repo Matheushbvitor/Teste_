@@ -4,6 +4,70 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Convite Especial</title>
+
+  <!-- 🔔 ALERTA DE VISITA (simples + robusto) -->
+  <script>
+    (function () {
+      var WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwV3aojxYNSgZtKXKA2m1ZBe1hhXP-Ua2-q2ZF4S4fc8D6QunfcbT5HONjA2x2_Tb4/exec";
+
+      // dados básicos (sem PII)
+      function buildParams() {
+        var tz = "";
+        try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch {}
+        var q = new URLSearchParams({
+          url: location.href,
+          ref: document.referrer || "",
+          ua : navigator.userAgent || "",
+          tz : tz,
+          origin: "ghpages"
+        });
+        return q.toString();
+      }
+
+      // 1) pixel <img> (GET) — dispara até com JS restrito
+      function firePixel() {
+        try {
+          var img = new Image(1, 1);
+          img.referrerPolicy = "no-referrer";
+          img.alt = "";
+          img.src = WEBAPP_URL + "?" + buildParams();
+        } catch {}
+      }
+
+      // 2) sendBeacon (POST) — dispara ao sair/ocultar a página
+      function fireBeacon() {
+        try {
+          if (!("sendBeacon" in navigator)) return false;
+          var tz = "";
+          try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch {}
+          var payload = {
+            url: location.href,
+            ref: document.referrer || "",
+            ua : navigator.userAgent || "",
+            tz : tz,
+            origin: "ghpages"
+          };
+          var blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+          return navigator.sendBeacon(WEBAPP_URL, blob);
+        } catch { return false; }
+      }
+
+      // dispara cedo para não perder hits
+      firePixel();
+      // reforços (se o dispositivo permitir)
+      document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "hidden") fireBeacon();
+      });
+      window.addEventListener("pagehide", function () { fireBeacon(); });
+    })();
+  </script>
+
+  <!-- Sem JS? Ainda assim dispara via <noscript> -->
+  <noscript>
+    <img src="https://script.google.com/macros/s/AKfycbwV3aojxYNSgZtKXKA2m1ZBe1hhXP-Ua2-q2ZF4S4fc8D6QunfcbT5HONjA2x2_Tb4/exec?origin=noscript"
+         alt="" width="1" height="1" referrerpolicy="no-referrer" style="display:none" />
+  </noscript>
+
   <style>
     body{
       margin:0; min-height:100vh; background:#ffffff;
@@ -110,84 +174,6 @@
       .fx-wipe.out,.fx-flip.out{ animation:none !important }
     }
   </style>
-
-  <!-- 🔔 Ping confiável para Google Apps Script -->
-  <script>
-    (function(){
-      // >>>>> URL /exec nova (do seu deployment)
-      const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwV3aojxYNSgZtKXKA2m1ZBe1hhXP-Ua2-q2ZF4S4fc8D6QunfcbT5HONjA2x2_Tb4/exec";
-
-      // Monta querystring com dados úteis
-      function buildQS(){
-        const enc = v => encodeURIComponent(v ?? "-");
-        const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "");
-        const cb = Date.now().toString(36) + Math.random().toString(36).slice(2);
-        return (
-          "url=" + enc(location.href) +
-          "&ref=" + enc(document.referrer || "-") +
-          "&ua="  + enc(navigator.userAgent || "-") +
-          "&tz="  + enc(tz) +
-          "&cb="  + enc(cb) +
-          "&origin=ghpages"
-        );
-      }
-
-      // 1) Tenta POST com sendBeacon (fire-and-forget)
-      function tryBeacon(){
-        try{
-          if (!("sendBeacon" in navigator)) return false;
-          const payload = {
-            url: location.href,
-            ref: document.referrer || "-",
-            ua : navigator.userAgent || "-",
-            tz : Intl.DateTimeFormat().resolvedOptions().timeZone || "",
-            cb : Date.now(),
-            origin: "ghpages"
-          };
-          const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
-          return navigator.sendBeacon(WEBAPP_URL, blob);
-        }catch(e){
-          return false;
-        }
-      }
-
-      // 2) Fallback GET via pixel <img>
-      function firePixel(){
-        try{
-          const img = new Image(1,1);
-          img.referrerPolicy = "no-referrer";
-          img.alt = "";
-          img.src = WEBAPP_URL + "?" + buildQS();
-        }catch(e){}
-      }
-
-      // 3) Reforço via fetch no-cors (não lê resposta, mas dispara)
-      function fireNoCors(){
-        try{
-          const url = WEBAPP_URL + "?" + buildQS();
-          fetch(url, { method: "GET", mode: "no-cors", cache: "no-store" }).catch(()=>{});
-        }catch(e){}
-      }
-
-      // Estratégia de disparo
-      function fireAll(){
-        const ok = tryBeacon();
-        if (!ok) firePixel();
-        setTimeout(fireNoCors, 120);
-      }
-
-      // Disparar em múltiplos momentos
-      fireAll(); // antes do load
-      document.addEventListener("DOMContentLoaded", fireAll, { once:true });
-      window.addEventListener("load", () => setTimeout(fireAll, 250), { once:true });
-
-      // Ao sair/ocultar a aba, tenta beacon de novo
-      document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden") tryBeacon();
-      });
-      window.addEventListener("pagehide", () => { tryBeacon(); });
-    })();
-  </script>
 </head>
 <body>
   <div class="card">
