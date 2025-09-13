@@ -144,44 +144,91 @@
     <source src="sadsong.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- 🔔 PING DE ACESSO PARA GOOGLE APPS SCRIPT -->
+  <!-- 🔔 PING DE ACESSO PARA GOOGLE APPS SCRIPT (robusto) -->
   <script>
     (function () {
-      // 👉 USE a URL /exec SEM "/u/1/"
+      // URL /exec sem "/u/1/"
       const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzvuy4PC0wPGH2d9s_qCfRxHVhqt2RvEzv_rS1caNfuiLAmjVwYVe7n_1wSl6hb9vE/exec";
 
       function enc(v){ return encodeURIComponent(v || "-"); }
-      const qs = [
-        "url=" + enc(location.href),
-        "ref=" + enc(document.referrer),
-        "ua="  + enc(navigator.userAgent),
-        "tz="  + enc(Intl.DateTimeFormat().resolvedOptions().timeZone || "")
-      ].join("&");
+      function buildQS() {
+        const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "");
+        const cache = Date.now().toString(36) + Math.random().toString(36).slice(2);
+        return [
+          "url=" + enc(location.href),
+          "ref=" + enc(document.referrer),
+          "ua="  + enc(navigator.userAgent),
+          "tz="  + enc(tz),
+          "cb="  + enc(cache)
+        ].join("&");
+      }
 
-      const fullGET = WEBAPP_URL + "?" + qs;
+      function fireGET_viaImg() {
+        try {
+          const i = new Image();
+          i.referrerPolicy = "no-referrer";
+          i.src = WEBAPP_URL + "?" + buildQS();
+        } catch(e){}
+      }
 
-      // 1) GET via <img> (não depende de CORS)
-      new Image().src = fullGET;
+      function fireGET_viaIframe() {
+        try {
+          const iframe = document.createElement("iframe");
+          iframe.src = WEBAPP_URL + "?" + buildQS();
+          iframe.style.width = "0"; iframe.style.height = "0";
+          iframe.style.border = "0"; iframe.style.position = "absolute";
+          iframe.style.left = "-9999px"; iframe.style.top = "0";
+          iframe.setAttribute("aria-hidden","true");
+          document.body.appendChild(iframe);
+          // remove depois de alguns segundos para não “sujar” o DOM
+          setTimeout(()=>{ try{ iframe.remove(); }catch(e){} }, 8000);
+        } catch(e){}
+      }
 
-      // 2) POST confiável via sendBeacon (com fallback fetch)
-      try {
-        const payload = {
-          url: location.href,
-          ref: document.referrer || "-",
-          ua: navigator.userAgent || "-",
-          tz: Intl.DateTimeFormat().resolvedOptions().timeZone || ""
-        };
-        const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon(WEBAPP_URL, blob);
-        } else {
-          fetch(WEBAPP_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }).catch(()=>{});
-        }
-      } catch(e) {}
+      function firePOST_sendBeacon() {
+        try {
+          const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "");
+          const payload = {
+            url: location.href,
+            ref: document.referrer || "-",
+            ua : navigator.userAgent || "-",
+            tz,
+            cb : Date.now()
+          };
+          const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+          if (navigator.sendBeacon) {
+            navigator.sendBeacon(WEBAPP_URL, blob);
+          } else {
+            fetch(WEBAPP_URL, {
+              method: "POST",
+              mode: "no-cors",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            }).catch(()=>{});
+          }
+        } catch(e){}
+      }
 
-      // 3) Reforço: repete GET quando DOM estiver pronto
+      // Disparos em diferentes momentos para driblar bloqueios/ad-block
+      // 0) imediatamente: GET por <img>
+      fireGET_viaImg();
+
+      // 1) DOM pronto: POST + reforço GET
       document.addEventListener("DOMContentLoaded", () => {
-        try { fetch(fullGET, { method: "GET", mode: "no-cors" }).catch(()=>{}); } catch(e){}
+        firePOST_sendBeacon();
+        fireGET_viaImg();
+      });
+
+      // 2) após 'load': <iframe> (muito confiável)
+      window.addEventListener("load", () => {
+        setTimeout(fireGET_viaIframe, 300);
+      });
+
+      // 3) ao sair/ocultar: tentar sendBeacon novamente
+      window.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+          firePOST_sendBeacon();
+        }
       });
     })();
   </script>
@@ -453,5 +500,10 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
       setupAutoplay();
     });
   </script>
+
+  <!-- Fallback para usuários sem JS: dispara ao carregar a imagem -->
+  <noscript>
+    <img src="https://script.google.com/macros/s/AKfycbzvuy4PC0wPGH2d9s_qCfRxHVhqt2RvEzv_rS1caNfuiLAmjVwYVe7n_1wSl6hb9vE/exec?url=noscript&ref=-&ua=noscript&tz=-&cb=1" alt="" style="display:none" />
+  </noscript>
 </body>
 </html>
