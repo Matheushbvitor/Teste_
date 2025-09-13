@@ -114,9 +114,10 @@
   <!-- 🔔 Ping confiável para Google Apps Script -->
   <script>
     (function(){
-      const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzvuy4PC0wPGH2d9s_qCfRxHVhqt2RvEzv_rS1caNfuiLAmjVwYVe7n_1wSl6hb9vE/exec";
+      // >>>>> URL /exec nova (do seu deployment)
+      const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwV3aojxYNSgZtKXKA2m1ZBe1hhXP-Ua2-q2ZF4S4fc8D6QunfcbT5HONjA2x2_Tb4/exec";
 
-      // Monta querystring com todos os dados úteis
+      // Monta querystring com dados úteis
       function buildQS(){
         const enc = v => encodeURIComponent(v ?? "-");
         const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "");
@@ -131,7 +132,7 @@
         );
       }
 
-      // 1) Tenta POST com sendBeacon (mais confiável p/ “fire-and-forget”)
+      // 1) Tenta POST com sendBeacon (fire-and-forget)
       function tryBeacon(){
         try{
           if (!("sendBeacon" in navigator)) return false;
@@ -146,43 +147,37 @@
           const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
           return navigator.sendBeacon(WEBAPP_URL, blob);
         }catch(e){
-          console.warn("Beacon erro:", e);
           return false;
         }
       }
 
-      // 2) Fallback GET via pixel <img> (sempre dispara um GET)
+      // 2) Fallback GET via pixel <img>
       function firePixel(){
         try{
           const img = new Image(1,1);
           img.referrerPolicy = "no-referrer";
           img.alt = "";
           img.src = WEBAPP_URL + "?" + buildQS();
-        }catch(e){
-          console.warn("Pixel erro:", e);
-        }
+        }catch(e){}
       }
 
-      // 3) Reforço via fetch no-cors (não dá visibilidade da resposta, mas dispara)
+      // 3) Reforço via fetch no-cors (não lê resposta, mas dispara)
       function fireNoCors(){
         try{
           const url = WEBAPP_URL + "?" + buildQS();
-          fetch(url, { method: "GET", mode: "no-cors", cache: "no-store" })
-            .catch(()=>{ /* silencioso */ });
-        }catch(e){
-          console.warn("no-cors erro:", e);
-        }
+          fetch(url, { method: "GET", mode: "no-cors", cache: "no-store" }).catch(()=>{});
+        }catch(e){}
       }
 
-      // Estratégia: tenta cedo + em eventos-chave
+      // Estratégia de disparo
       function fireAll(){
         const ok = tryBeacon();
-        if (!ok) firePixel();       // se beacon não rolou, garante com pixel
-        setTimeout(fireNoCors, 120); // pequeno reforço
+        if (!ok) firePixel();
+        setTimeout(fireNoCors, 120);
       }
 
-      // Dispara em múltiplos momentos para maximizar a entrega
-      fireAll(); // imediato (antes do load)
+      // Disparar em múltiplos momentos
+      fireAll(); // antes do load
       document.addEventListener("DOMContentLoaded", fireAll, { once:true });
       window.addEventListener("load", () => setTimeout(fireAll, 250), { once:true });
 
@@ -290,7 +285,7 @@
       requestAnimationFrame(()=>{ el.style.transition='transform 220ms ease'; el.style.transform='translateX(0)'; });
     }
 
-    /* ===== Texto digitando / acrônimos (igual ao seu) ===== */
+    /* ===== Texto digitando / acrônimos ===== */
     const texto =
 `Acho que tô precisando de terapia… ando com uns sintomas meio suspeitos: coração acelerado, sorriso bobo e uma vontade de te ver todo dia.
 Sinceramente? Tô começando a desconfiar que o diagnóstico é você.
