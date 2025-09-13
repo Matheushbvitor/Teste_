@@ -31,8 +31,6 @@
     .btn{ padding:15px 25px; font-size:18px; border:none; border-radius:10px; cursor:pointer; transition:transform .15s ease,filter .15s ease; }
     .btn:active{ transform:scale(.98) } .btn:hover{ filter:brightness(1.06) }
     .yes{ background:#4CAF50; color:#fff } .no{ background:#f44336; color:#fff } .why{ background:#ff9800; color:#fff; position:relative; overflow:visible }
-
-    /* === Destaque criativo para o botão "Por que..." === */
     .why.attn{ animation: why-pulse 1.4s ease-in-out infinite; box-shadow: 0 0 0 0 rgba(255,152,0,.55); }
     .why.attn::before{
       content:""; position:absolute; inset:-6px; border-radius:12px;
@@ -57,7 +55,6 @@
     @keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
     .shaking{ animation:shake .3s }
 
-    /* === Acrônimo + efeitos === */
     #acronymFull{
       width:min(860px,92vw); margin:16px auto 0; padding:12px 16px;
       background:rgba(255,255,255,.06); border-radius:12px;
@@ -93,11 +90,9 @@
     .fx-wipe.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
     @keyframes wipe-in{from{clip-path:inset(0 100% 0 0);transform:translateY(4px);opacity:.0}to{clip-path:inset(0 0 0 0);transform:translateY(0);opacity:1}}
     @keyframes wipe-out{from{clip-path:inset(0 0 0 0);opacity:1}to{clip-path:inset(0 100% 0 0);opacity:0}}
-
     .fx-flip .text{ transform-origin:left center; will-change:transform,opacity; }
     .fx-flip.in  .text{ animation:flip-in 520ms calc(var(--d,0ms) + 90ms) cubic-bezier(.2,.8,.2,1) both; }
     .fx-flip.out .text{ animation:flip-out 300ms var(--d,0ms) ease-in both; }
-    .fx-flip.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
 
     @media (prefers-reduced-motion: reduce){
       .why.attn,.why.wiggle{ animation:none !important }
@@ -152,8 +147,8 @@
   <!-- 🔔 PING DE ACESSO PARA GOOGLE APPS SCRIPT -->
   <script>
     (function () {
-      // sua URL /exec já publicada para "Anyone"
-      const WEBAPP_URL = "https://script.google.com/macros/u/1/s/AKfycbzvuy4PC0wPGH2d9s_qCfRxHVhqt2RvEzv_rS1caNfuiLAmjVwYVe7n_1wSl6hb9vE/exec";
+      // 👉 USE a URL /exec SEM "/u/1/"
+      const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzvuy4PC0wPGH2d9s_qCfRxHVhqt2RvEzv_rS1caNfuiLAmjVwYVe7n_1wSl6hb9vE/exec";
 
       function enc(v){ return encodeURIComponent(v || "-"); }
       const qs = [
@@ -163,14 +158,30 @@
         "tz="  + enc(Intl.DateTimeFormat().resolvedOptions().timeZone || "")
       ].join("&");
 
-      const fullURL = WEBAPP_URL + "?" + qs;
+      const fullGET = WEBAPP_URL + "?" + qs;
 
-      // Beacon confiável via <img> (não depende de CORS)
-      new Image().src = fullURL;
+      // 1) GET via <img> (não depende de CORS)
+      new Image().src = fullGET;
 
-      // Fallback com fetch GET (silencioso)
+      // 2) POST confiável via sendBeacon (com fallback fetch)
+      try {
+        const payload = {
+          url: location.href,
+          ref: document.referrer || "-",
+          ua: navigator.userAgent || "-",
+          tz: Intl.DateTimeFormat().resolvedOptions().timeZone || ""
+        };
+        const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(WEBAPP_URL, blob);
+        } else {
+          fetch(WEBAPP_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }).catch(()=>{});
+        }
+      } catch(e) {}
+
+      // 3) Reforço: repete GET quando DOM estiver pronto
       document.addEventListener("DOMContentLoaded", () => {
-        try { fetch(fullURL, { method: "GET", mode: "no-cors" }).catch(()=>{}); } catch(e){}
+        try { fetch(fullGET, { method: "GET", mode: "no-cors" }).catch(()=>{}); } catch(e){}
       });
     })();
   </script>
