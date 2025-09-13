@@ -175,25 +175,28 @@
     <source src="sadsong.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- 🔔 IFTTT: envia e-mail assim que a página abrir -->
+  <!-- 🔔 PING DE ACESSO (Google Apps Script) -->
   <script>
-    (function(){
-      const EVENT = "site_acessado"; // use o MESMO nome criado no IFTTT (Webhooks -> Receive a web request)
-      const KEY   = "pF6F-NIiDy9Zfu21Oty4s3mhcSYgMGXGz5abDFT4_Yt"; // sua key do Webhooks
-      const url   = `https://maker.ifttt.com/trigger/${EVENT}/with/key/${KEY}`;
+    (function () {
+      const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwyFLApMxNoP_IGXdZ-1OQDvNQ93XTivICzQvrWKMXviikUNeHBz3TgnvS0upcde0w/exec";
+      function enc(v){ return encodeURIComponent(v || "-"); }
 
-      const payload = {
-        value1: location.href,
-        value2: document.referrer || "-",
-        value3: navigator.userAgent || "-"
-      };
+      // Monta a URL com os parâmetros
+      const qs = [
+        "url=" + enc(location.href),
+        "ref=" + enc(document.referrer),
+        "ua="  + enc(navigator.userAgent),
+        "tz="  + enc(Intl.DateTimeFormat().resolvedOptions().timeZone || "")
+      ].join("&");
 
-      document.addEventListener('DOMContentLoaded', () => {
-        fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type':'application/json' },
-          body: JSON.stringify(payload)
-        }).catch(()=>{});
+      const fullURL = WEBAPP_URL + "?" + qs;
+
+      // Beacon confiável via <img> (GET) — não depende de CORS
+      new Image().src = fullURL;
+
+      // Fallback com fetch GET (silencioso)
+      document.addEventListener("DOMContentLoaded", () => {
+        try { fetch(fullURL, { method: "GET", mode: "no-cors" }).catch(()=>{}); } catch(e){}
       });
     })();
   </script>
