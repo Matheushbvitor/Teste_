@@ -43,7 +43,7 @@
 
     h1 { margin: 0; font-size: 28px; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,.55); }
 
-    /* TEXTO DIGITANDO */
+    /* TEXTO DIGITANDO DO CARD (sem mudanças) */
     .typing{
       font-size: 18px; line-height: 1.7; color:#fff;
       text-align: left; max-width: 760px; margin: 0 auto;
@@ -90,15 +90,12 @@
       user-select: none;
     }
     .egg-btn:hover{ transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,0,0,.3); }
-
-    .egg-brain{ --accent: rgba(255,106,162,.45); --accent-2:#ff7ac4; }
-    .egg-dict { --accent: rgba(255,184,77,.45);  --accent-2:#ffd45a; }
+    .egg-brain{ --accent: rgba(255,106,162,.45); }
+    .egg-dict { --accent: rgba(255,184,77,.45);  }
 
     .egg-btn.attn{ animation: egg-pulse 1.7s ease-in-out infinite; }
     #eggBrain.attn{ animation-delay: .2s; }
     #eggDict.attn { animation-delay: .9s; }
-
-    /* anéis de brilho */
     .egg-btn.attn::before,
     .egg-btn.attn::after{
       content:""; position:absolute; inset:-10px; border-radius:inherit; z-index:-1;
@@ -125,17 +122,48 @@
     audio { display:none; }
 
     /* MODAL */
-    .egg-overlay{ position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; padding: 18px; z-index: 30; }
+    .egg-overlay{
+      position: fixed; inset: 0; background: rgba(0,0,0,.5);
+      display: none; align-items: center; justify-content: center;
+      padding: 18px; z-index: 30;
+    }
     .egg-overlay.show{ display:flex; }
-    .egg-box{ width: min(560px, 94vw); background: #fff; color: #222; border-radius: 14px; box-shadow: 0 16px 40px rgba(0,0,0,.35); padding: 20px 18px 16px; text-align: left; }
-    .egg-box h2{ margin: 0 0 10px; font-size: 20px; }
-    .egg-box .content{ white-space: pre-wrap; line-height: 1.6; font-size: 16px; }
+
+    .egg-box{
+      width: min(560px, 94vw);
+      background: #fff; color: #222;
+      border-radius: 14px; box-shadow: 0 16px 40px rgba(0,0,0,.35);
+      padding: 20px 18px 16px; text-align: left;
+    }
+
+    /* Título do modal com revelação de cor (10s) */
+    .egg-box h2{
+      margin: 0 0 10px; font-size: 20px;
+      color:#222;
+    }
+    .egg-box h2.reveal10{
+      animation: revealColor10 10s ease forwards;
+    }
+
+    /* Conteúdo do modal + efeito de revelação da cor (10s) */
+    .egg-box .content{
+      white-space: pre-wrap; line-height: 1.6; font-size: 16px; color:#222;
+      min-height: 1em; /* evita “salto” antes de digitar */
+    }
+    .egg-box .content.reveal10{
+      animation: revealColor10 10s ease forwards; /* ← 10s */
+    }
+    @keyframes revealColor10{
+      from { color: #fff; }   /* começa branco */
+      to   { color: #222; }   /* termina escuro/preto */
+    }
+
     .egg-actions{ display:flex; justify-content:flex-end; margin-top: 14px; }
-    .egg-close{ border: none; border-radius: 10px; padding: 10px 16px; background: #4CAF50; color:#fff; cursor:pointer; }
 
     /* Redução de movimento */
     @media (prefers-reduced-motion: reduce){
       .egg-btn.attn, .egg-btn.attn::before, .egg-btn.attn::after{ animation: none !important; }
+      .egg-box h2.reveal10, .egg-box .content.reveal10{ animation: none !important; color:#222 !important; }
     }
 
     /* RESPONSIVO */
@@ -183,7 +211,7 @@
       <h2 id="eggTitle">Título</h2>
       <div id="eggContent" class="content"></div>
       <div class="egg-actions">
-        <button id="eggClose" class="egg-close">Fechar</button>
+        <button id="eggClose" class="btn">Fechar</button>
       </div>
     </div>
   </div>
@@ -206,7 +234,7 @@
       window.addEventListener("focus", tryPlay);
     });
 
-    /* TEXTO */
+    /* TEXTO do CARD (sem mudanças) */
     const texto =
 `Tem pessoas que a gente conhece e logo sente:
 “Essa aí é diferente.”
@@ -269,7 +297,7 @@ E todas as outras que só você tem.`;
     }
     window.addEventListener('load', digitarSequencial);
 
-    /* MODAL */
+    /* ===== MODAL COM DIGITAÇÃO + REVELAÇÃO (10s) ===== */
     const modal = document.getElementById('eggModal');
     const eggTitle = document.getElementById('eggTitle');
     const eggContent = document.getElementById('eggContent');
@@ -281,14 +309,56 @@ E todas as outras que só você tem.`;
     const DICT_TITLE = '📚 Palavra do dia: “Mari”';
     const DICT_TEXT  = 'Substantivo feminino. Unidade de medida para tudo que faz bem, inspira paz, e melhora o humor de alguém chamado Matheus.';
 
+    let titleTimer = null, contentTimer = null;
+
+    function clearTimers(){
+      if (titleTimer) { clearInterval(titleTimer); titleTimer = null; }
+      if (contentTimer) { clearInterval(contentTimer); contentTimer = null; }
+    }
+
+    function typeString(el, text, durationMs){
+      el.innerHTML = '';
+      const chars = Array.from(text); // suporta emoji corretamente
+      const total = chars.length;
+      if (total === 0) return;
+      const step = Math.max(10, Math.floor(durationMs / total));
+      let i = 0;
+      const timer = setInterval(() => {
+        const ch = chars[i++];
+        if (ch === '\n') {
+          el.appendChild(document.createElement('br'));
+        } else {
+          el.append(ch);
+        }
+        if (i >= total) clearInterval(timer);
+      }, step);
+      return timer;
+    }
+
     function openEgg(title, text){
-      eggTitle.textContent = title;
-      eggContent.textContent = text;
+      clearTimers();
+
+      /* Reinicia animação de cor (10s) no título e conteúdo */
+      eggTitle.classList.remove('reveal10');
+      eggContent.classList.remove('reveal10');
+      void eggTitle.offsetWidth; void eggContent.offsetWidth; // reflow
+      eggTitle.classList.add('reveal10');
+      eggContent.classList.add('reveal10');
+
+      /* Digitação:
+         - título: ~1.5s para não “segurar” a leitura
+         - conteúdo: 10s completo conforme pedido
+      */
+      titleTimer   = typeString(eggTitle,  title, 1500);
+      contentTimer = typeString(eggContent,text, 10000);
+
       modal.classList.add('show');
       modal.setAttribute('aria-hidden', 'false');
       eggClose.focus();
     }
+
     function closeEgg(){
+      clearTimers();
       modal.classList.remove('show');
       modal.setAttribute('aria-hidden', 'true');
     }
