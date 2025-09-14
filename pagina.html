@@ -24,8 +24,7 @@
       background-position: center center;
       background-repeat: no-repeat;
 
-      /* Alinha o CARD no centro da tela (horizontal e vertical) */
-      display: grid;
+      display: grid;          /* centraliza o card */
       place-items: center;
 
       padding: 20px;
@@ -67,23 +66,31 @@
       line-height: 1.7;
       color:#fff;
 
-      /* leitura confortável (alinhado à esquerda),
-         bloco centralizado dentro do card */
-      text-align: left;
+      text-align: left;       /* leitura confortável */
       max-width: 760px;
       margin: 0 auto;
 
       border-right: 2px solid rgba(255,255,255,.9);
       animation: blink-caret .75s step-end infinite;
-      white-space: pre-wrap;     /* respeita \n */
-      overflow-wrap: anywhere;   /* evita overflows em telas estreitas */
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
       text-shadow: 0 1px 2px rgba(0,0,0,.55);
     }
     @keyframes blink-caret { 50% { border-color: transparent; } }
 
     /* ------------------------------
-       BOTÃO
+       AÇÕES (EMOJIS + RETORNAR)
        ------------------------------ */
+    .actions{
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;  /* 🧠 | Retornar | 📚 */
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 760px;  /* acompanha a largura do texto */
+      margin-top: 8px;
+    }
+
     .btn {
       padding: 12px 22px;
       font-size: 16px;
@@ -93,12 +100,98 @@
       color: #fff;
       cursor: pointer;
       transition: transform .15s ease, filter .15s ease;
-      align-self: center;
+      justify-self: center;  /* fica no centro da faixa */
     }
     .btn:active { transform: scale(0.98); }
     .btn:hover  { filter: brightness(1.05); }
 
+    /* Botões de emoji agora são inline dentro do card */
+    .egg-btn{
+      position: relative;     /* para o anel do ::after */
+      width: 44px; height: 44px;
+      display:flex; align-items:center; justify-content:center;
+      font-size: 22px; line-height: 1;
+      border-radius: 999px;
+      background: rgba(255,255,255,.9);
+      color:#222;
+      box-shadow: 0 6px 18px rgba(0,0,0,.25);
+      border: 1px solid rgba(0,0,0,.08);
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: transform .15s ease, box-shadow .15s ease;
+      user-select: none;
+    }
+    .egg-btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.28); }
+
+    /* ✨ PULSO/Glow para chamar atenção */
+    .egg-btn.attn{ animation: egg-pulse 1.8s ease-in-out infinite; }
+    #eggBrain.attn{ animation-delay: .2s; }
+    #eggDict.attn { animation-delay: .9s; }
+
+    .egg-btn.attn::after{
+      content:"";
+      position:absolute; inset:-8px;
+      border-radius: 999px;
+      background: radial-gradient(closest-side, rgba(255,255,255,.55), rgba(255,255,255,0) 70%);
+      opacity: 0;
+      transform: scale(.8);
+      pointer-events:none;
+      animation: egg-glow 1.8s ease-in-out infinite;
+    }
+    @keyframes egg-pulse{
+      0%   { transform: scale(1);   box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+      50%  { transform: scale(1.08); box-shadow: 0 10px 26px rgba(0,0,0,.28); }
+      100% { transform: scale(1);   box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+    }
+    @keyframes egg-glow{
+      0%   { opacity: 0;   transform: scale(.85); }
+      50%  { opacity: .35; transform: scale(1.18); }
+      100% { opacity: 0;   transform: scale(1.35); }
+    }
+
+    .egg-left  { justify-self: start; }
+    .egg-right { justify-self: end; }
+
     audio { display:none; }
+
+    /* ------------------------------
+       MODAL/DIÁLOGO DOS EASTER EGGS
+       ------------------------------ */
+    .egg-overlay{
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      display: none;            /* aparece via .show */
+      align-items: center; justify-content: center;
+      padding: 18px;
+      z-index: 30;
+    }
+    .egg-overlay.show{ display:flex; }
+
+    .egg-box{
+      width: min(560px, 94vw);
+      background: #fff;
+      color: #222;
+      border-radius: 14px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+      padding: 20px 18px 16px;
+      text-align: left;
+    }
+    .egg-box h2{ margin: 0 0 10px; font-size: 20px; }
+    .egg-box .content{
+      white-space: pre-wrap;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+    .egg-actions{ display:flex; justify-content:flex-end; margin-top: 14px; }
+    .egg-close{
+      border: none; border-radius: 10px; padding: 10px 16px;
+      background: #4CAF50; color:#fff; cursor:pointer;
+    }
+
+    /* Respeita usuários com redução de movimento */
+    @media (prefers-reduced-motion: reduce){
+      .egg-btn.attn, .egg-btn.attn::after{ animation: none !important; }
+    }
 
     /* ------------------------------
        RESPONSIVIDADE
@@ -107,6 +200,8 @@
       .card { padding: 22px 16px; gap: 14px; }
       h1    { font-size: 24px; }
       .typing{ font-size: 17px; line-height: 1.6; max-width: 92%; }
+      .actions{ max-width: 92%; }
+      .egg-btn{ width:40px; height:40px; font-size:20px; }
     }
     @media (max-width: 360px){
       h1    { font-size: 22px; }
@@ -121,7 +216,35 @@
     <!-- O texto será digitado com o efeito -->
     <p id="textoDigitado" class="typing" aria-live="polite"></p>
 
-    <button class="btn" onclick="retornar()">Retornar</button>
+    <!-- 🧠 à esquerda | Retornar | 📚 à direita -->
+    <div class="actions">
+      <button
+        id="eggBrain"
+        class="egg-btn egg-left attn"
+        aria-label="Abrir: Vamos analisar esse caso clínico..."
+        title="🧠 Vamos analisar esse caso clínico..."
+      >🧠</button>
+
+      <button class="btn" onclick="retornar()">Retornar</button>
+
+      <button
+        id="eggDict"
+        class="egg-btn egg-right attn"
+        aria-label="Abrir: Palavra do dia: “Mari”"
+        title="📚 Palavra do dia: “Mari”"
+      >📚</button>
+    </div>
+  </div>
+
+  <!-- Modal genérico para os dois easter eggs -->
+  <div id="eggModal" class="egg-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="egg-box" role="document">
+      <h2 id="eggTitle">Título</h2>
+      <div id="eggContent" class="content"></div>
+      <div class="egg-actions">
+        <button id="eggClose" class="egg-close">Fechar</button>
+      </div>
+    </div>
   </div>
 
   <!-- Música em loop (tenta iniciar automaticamente) -->
@@ -160,15 +283,12 @@ E todas as outras que só você tem.`;
     const destino = document.getElementById("textoDigitado");
     let index = 0;
 
-    /* ===== VELOCIDADE 1,75× DO ORIGINAL (redução de 0,25 em relação ao 2×) =====
-       Originais: 16, 24, 50, 118, 35
-       Novos ≈ orig / 1.75 -> 9, 14, 29, 67, 20
-    */
-    const BASE_INTERVAL   = 9;   // antes (2×): 8
-    const COMMA_PAUSE     = 14;  // antes (2×): 12
-    const SENTENCE_PAUSE  = 29;  // antes (2×): 25
-    const REVEAL_DELAY    = 67;  // antes (2×): 59
-    const FADE_DURATION   = 20;  // antes (2×): 18
+    /* Velocidade ajustada (1,75× do original) */
+    const BASE_INTERVAL   = 9;
+    const COMMA_PAUSE     = 14;
+    const SENTENCE_PAUSE  = 29;
+    const REVEAL_DELAY    = 67;
+    const FADE_DURATION   = 20;
 
     function nextDelayFor(c){
       if (c === ',' || c === ';') return BASE_INTERVAL + COMMA_PAUSE;
@@ -181,24 +301,17 @@ E todas as outras que só você tem.`;
         destino.style.borderRight = 'none';
         return;
       }
-
       const c = texto.charAt(index);
-
-      // Espaço
       if (c === ' '){
         destino.append(' ');
         index++;
         return setTimeout(digitarSequencial, BASE_INTERVAL);
       }
-
-      // Quebra de linha
       if (c === '\n'){
         destino.appendChild(document.createElement('br'));
         index++;
         return setTimeout(digitarSequencial, BASE_INTERVAL + SENTENCE_PAUSE);
       }
-
-      // Coração que vira a letra digitada
       const span = document.createElement('span');
       span.textContent = '❤️';
       span.style.display = 'inline';
@@ -219,6 +332,38 @@ E todas as outras que só você tem.`;
 
     // Inicializa o efeito ao carregar
     window.addEventListener('load', digitarSequencial);
+
+    /* ===== EASTER EGGS: modal genérico ===== */
+    const modal = document.getElementById('eggModal');
+    const eggTitle = document.getElementById('eggTitle');
+    const eggContent = document.getElementById('eggContent');
+    const eggClose = document.getElementById('eggClose');
+
+    /* 🧠 (já atualizado anteriormente) */
+    const BRAIN_TITLE = '🧠 Vamos analisar esse caso clínico...';
+    const BRAIN_TEXT  = 'Paciente apresenta sintomas de apego progressivo, pensamento acelerado, sorriso involuntário, e comportamento de admiração. Diagnóstico provável: envolvimento afetivo crônico não resolvido.';
+
+    /* 📚 ATUALIZADO CONFORME PEDIDO */
+    const DICT_TITLE = '📚 Palavra do dia: “Mari”';
+    const DICT_TEXT  = 'Substantivo feminino. Unidade de medida para tudo que faz bem, inspira paz, e melhora o humor de alguém chamado Matheus.';
+
+    function openEgg(title, text){
+      eggTitle.textContent = title;
+      eggContent.textContent = text;      // preserva texto puro
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+      eggClose.focus();
+    }
+    function closeEgg(){
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    document.getElementById('eggBrain').addEventListener('click', ()=>openEgg(BRAIN_TITLE, BRAIN_TEXT));
+    document.getElementById('eggDict').addEventListener('click',  ()=>openEgg(DICT_TITLE,  DICT_TEXT));
+    eggClose.addEventListener('click', closeEgg);
+    modal.addEventListener('click', (e)=>{ if(e.target === modal) closeEgg(); });
+    window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeEgg(); });
   </script>
 </body>
 </html>
