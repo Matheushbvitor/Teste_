@@ -7,12 +7,6 @@
 
   <!-- 🔔 ALERTA DE VISITA (envio POST via Apps Script) -->
   <script>
-    /*
-      Envia um ping ao Web App do Google Apps Script.
-      - POST com navigator.sendBeacon (fallback: fetch no-cors)
-      - Debounce por sessão no load; segunda tentativa no pagehide
-      - Inclui ts, tz, ua, url, ref
-    */
     (function () {
       const WEBAPP_URL =
         "https://script.google.com/macros/s/AKfycbywQp57GZYvrej_zR1m12Sh006xtAXP6QuhmC5KbL0DmDK-qvJoNbEUT-rOhz100Bo/exec";
@@ -45,8 +39,6 @@
           }
         } catch {}
       }
-
-      // 1ª tentativa (debounced por sessão)
       addEventListener("load", () => {
         const KEY = "visitPingSent";
         try {
@@ -56,31 +48,54 @@
           }
         } catch { postPing(); }
       });
-
-      // 2ª tentativa (sem debounce, deixa o Apps Script filtrar)
       addEventListener("pagehide", postPing);
     })();
   </script>
 
   <style>
-    /* BASE */
+    /* ===== BASE ===== */
+    :root{ --bg-dim: .75; } /* escurece o preenchimento borrado p/ legibilidade */
+
     body{
       margin:0;
       min-height:100svh;
-      background:#ffffff;
-      background-image:url("IMG_20250823_124847408.jpg");
-      background-size:cover;              /* ocupa a tela toda, sem faixas */
-      background-position:center;
-      background-repeat:no-repeat;
-      display:grid;
-      place-items:center;
-      padding:clamp(16px,4vw,32px);
+      background:#000; /* fica por trás do blur */
       text-align:center;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
     }
+
+    /* Palco centraliza o conteúdo e carrega a imagem via CSS var --hero */
+    .stage{
+      position:relative;
+      min-height:100svh;
+      display:grid;
+      place-items:center;
+      padding:clamp(16px,4vw,32px);
+      overflow:hidden; /* corta o blur que passa da tela */
+    }
+
+    /* Camadas de fundo */
+    .bg{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+    .bg-fill, .bg-photo{ position:absolute; inset:0; background-position:center; background-repeat:no-repeat; }
+
+    /* preenchimento borrado com cover (preenche as laterais) */
+    .bg-fill{
+      background-size:cover;
+      filter: blur(16px) brightness(var(--bg-dim));
+      transform: scale(1.05); /* evita borda do blur */
+    }
+
+    /* foto nítida por cima, inteira (contain) */
+    .bg-photo{
+      background-size:contain;
+      /* sem blur; imagem por completo */
+    }
+
+    /* ===== CARD ===== */
     .card{
       position:relative;
-      width:min(600px,94vw);              /* fluido no mobile */
+      z-index:2;
+      width:min(600px,94vw);
       background:rgba(0,0,0,.55);
       color:#fff;
       padding:clamp(16px,4vw,32px);
@@ -110,7 +125,6 @@
     }
     @keyframes blink-caret{ 50%{ border-color:transparent } }
 
-    /* em telas grandes, aumente o título explicitamente */
     @media (min-width:1200px){
       h1.title{ font-size:48px; }
       .typing{ font-size:24px; }
@@ -122,12 +136,11 @@
       font-size:clamp(1rem,3.8vw,1.125rem);
       border:none; border-radius:10px; cursor:pointer;
       transition:transform .15s ease,filter .15s ease;
-      min-height:44px; /* alvo mínimo para toque */
+      min-height:44px;
     }
     .btn:active{ transform:scale(.98) } .btn:hover{ filter:brightness(1.06) }
     .yes{ background:#4CAF50; color:#fff } .no{ background:#f44336; color:#fff } .why{ background:#ff9800; color:#fff; position:relative; overflow:visible }
 
-    /* Botão “Por que…” com destaque e setinha */
     .why.attn{ animation: why-pulse 1.4s ease-in-out infinite; box-shadow: 0 0 0 0 rgba(255,152,0,.55); }
     .why.attn::before{
       content:""; position:absolute; inset:-6px; border-radius:12px;
@@ -147,11 +160,10 @@
       0%{ transform:translateY(0) rotate(0) } 25%{ transform:translateY(-1px) rotate(-2deg) }
       50%{ transform:translateY(0) rotate(0) } 75%{ transform:translateY(1px) rotate(2deg) } 100%{ transform:translateY(0) rotate(0) }
     }
-
     .btn .emo{ margin-left:.35em; display:inline-block; transform:translateY(1px) }
 
-    /* Modal com a mensagem */
-    .dialog-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); justify-content:center; align-items:center; padding:16px; }
+    /* Modal */
+    .dialog-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); justify-content:center; align-items:center; padding:16px; z-index:50; }
     .dialog-box{ width:min(460px,92vw); background:rgba(255,255,255,.96); border-radius:12px; padding:20px; text-align:center; box-shadow:0 12px 36px rgba(0,0,0,.35); backdrop-filter:blur(2px); }
     .dialog-box p{ margin:0 0 16px; font-size:18px; color:#333; white-space: pre-wrap; }
     .dialog-buttons{ display:flex; gap:12px; justify-content:center; }
@@ -198,7 +210,7 @@
 
     .fx-wipe .text{ will-change:clip-path,transform,opacity; }
     .fx-wipe.in .text{ animation:wipe-in 520ms calc(var(--d,0ms) + 120ms) cubic-bezier(.22,.7,.16,1) both; }
-    .fx-wipe.out .text{ animation:row-out 320ms var(--d,0ms) ease-in both; }
+    .fx-wipe.out .text{ animation:row-out 300ms var(--d,0ms) ease-in both; }
     .fx-wipe.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
 
     .fx-flip .text{ transform-origin:left center; will-change:transform,opacity; }
@@ -210,22 +222,31 @@
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1 class="title">Oi Mari <span id="emojiCycler" class="title-emoji" aria-hidden="true">😍</span></h1>
-    <p id="textoDigitado" class="typing"></p>
-
-    <div class="button-container">
-      <button id="whyBtn" class="btn why attn" aria-label="Descubra por que eu quero uma chance" onclick="abrirPagina()">
-        Por que eu quero uma chance? 🤔
-      </button>
+  <!-- Troque a imagem aqui (uma vez só) -->
+  <div class="stage" style="--hero: url('IMG_20250823_124847408.jpg')">
+    <!-- Fundo com duas camadas -->
+    <div class="bg" aria-hidden="true">
+      <div class="bg-fill"  style="background-image: var(--hero);"></div>
+      <div class="bg-photo" style="background-image: var(--hero);"></div>
     </div>
 
-    <div class="button-container">
-      <button class="btn yes" onclick="aceitou()">Tenho chance! <span class="emo" role="img" aria-label="rosto apaixonado">🥰</span></button>
-      <button class="btn no"  onclick="mostrarMensagemNao()">Não tenho chance! <span class="emo" role="img" aria-label="triste">🙁</span></button>
-    </div>
+    <div class="card">
+      <h1 class="title">Oi Mari <span id="emojiCycler" class="title-emoji" aria-hidden="true">😍</span></h1>
+      <p id="textoDigitado" class="typing"></p>
 
-    <section id="acronymFull" aria-live="polite" aria-atomic="true"></section>
+      <div class="button-container">
+        <button id="whyBtn" class="btn why attn" aria-label="Descubra por que eu quero uma chance" onclick="abrirPagina()">
+          Por que eu quero uma chance? 🤔
+        </button>
+      </div>
+
+      <div class="button-container">
+        <button class="btn yes" onclick="aceitou()">Tenho chance! <span class="emo" role="img" aria-label="rosto apaixonado">🥰</span></button>
+        <button class="btn no"  onclick="mostrarMensagemNao()">Não tenho chance! <span class="emo" role="img" aria-label="triste">🙁</span></button>
+      </div>
+
+      <section id="acronymFull" aria-live="polite" aria-atomic="true"></section>
+    </div>
   </div>
 
   <!-- Modal -->
@@ -243,8 +264,8 @@
   <audio id="feliznavida-audio" preload="auto" playsinline><source src="feliznavida.mp3" type="audio/mpeg"></source></audio>
   <audio id="sadsong-audio" preload="auto" playsinline><source src="sadsong.mp3" type="audio/mpeg"></source></audio>
 
+  <!-- ====== JS original (sem alterações) ====== -->
   <script>
-    /* ===== Música de fundo (kennyg) ===== */
     const AUTOPLAY_DELAY_MS = 3000;
     let bgmStarted = false;
 
@@ -262,7 +283,6 @@
       window.addEventListener('pageshow', startBGM);
     }
 
-    /* ===== SadSong no modal ===== */
     function playSadLoop(){ const sad = document.getElementById('sadsong-audio'); if (!sad) return; sad.loop = true; sad.volume = 0.5; try { sad.currentTime = 0; sad.play().catch(()=>{}); } catch(e){} }
     function stopSadLoop(){ const sad = document.getElementById('sadsong-audio'); if (!sad) return; try { sad.pause(); } catch(e){} sad.currentTime = 0; sad.loop = false; }
 
@@ -301,7 +321,6 @@ E, acima de tudo, espero que isso não interfira na nossa amizade, que é algo q
       playBGMNow();
     }
 
-    /* ===== Texto digitando / cabeçalho ===== */
     const texto =
 `Acho que tô precisando de terapia… ando com uns sintomas meio suspeitos: coração acelerado, sorriso bobo e uma vontade de te ver todo dia.
 Sinceramente? Tô começando a desconfiar que o diagnóstico é você.
@@ -319,11 +338,9 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
       setTimeout(()=>{ span.style.opacity='0'; setTimeout(()=>{ span.textContent=c; span.style.opacity='1'; index++; setTimeout(digitarSequencial,nextDelayFor(c)); },FADE_DURATION); },REVEAL_DELAY);
     }
 
-    /* ===== Emoji do título ===== */
     const emojiList=["🤩","🥰","😍","💖"], emojiEl=document.getElementById("emojiCycler"); let emojiIndex=0;
     function cycleEmoji(){ emojiEl.style.opacity='0'; setTimeout(()=>{ emojiIndex=(emojiIndex+1)%emojiList.length; emojiEl.textContent=emojiList[emojiIndex]; emojiEl.style.opacity='1'; },260); }
 
-    /* ===== Acrônimos ===== */
     const ACRONYM_BLOCK = `
 ---ACRONIMOS_POR_LETRA---
 [M]
@@ -429,10 +446,10 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
         const fx=FX_TYPES[Math.floor(Math.random()*FX_TYPES.length)];
         row.className=`row fx-${fx} in`;
         row.dataset.fx=fx;
-        row.style.setProperty('--d','0ms');        /* entrada sem escalonamento */
+        row.style.setProperty('--d','0ms');
         const chip=document.createElement('div'); 
         chip.className='letter anim'; 
-        chip.style.setProperty('--delay','0ms');    /* letras entram juntas */
+        chip.style.setProperty('--delay','0ms');
         chip.textContent=letters[i]||'';
         const span=document.createElement('div'); span.className='text'; span.textContent=txt;
         row.appendChild(chip); row.appendChild(span); wrapper.appendChild(row);
@@ -444,7 +461,6 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
       const full=document.getElementById('acronymFull'); if(!full) return;
       const wrapper=buildWrapper(lines);
 
-      /* medir nova altura sem “piscar” */
       const meas=full.cloneNode(false);
       meas.style.cssText='position:absolute; visibility:hidden; pointer-events:none; left:-9999px; top:0; height:auto;';
       meas.style.width=full.clientWidth+'px';
@@ -471,7 +487,7 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
 
       if(!rows.length){ renderFullAcronym(lines); swapBusy=false; return; }
       rows.forEach((r)=>{ r.classList.remove('in'); r.classList.add('out'); r.style.setProperty('--d','0ms'); });
-      const outTotal = 360; // ms
+      const outTotal = 360;
 
       setTimeout(()=>{ renderFullAcronym(lines); swapBusy=false; }, outTotal);
     }
