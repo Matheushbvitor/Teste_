@@ -5,49 +5,85 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Por que eu quero uma chance?</title>
   <style>
-    /* Fundo com a sua foto (mostrando 100% da imagem) */
+    /* ------------------------------
+       RESET E BASE TIPOGRÁFICA
+       ------------------------------ */
+    *, *::before, *::after { box-sizing: border-box; }
+    :root { --card-bg: rgba(0,0,0,.55); }
+
+    /* ------------------------------
+       FUNDO COM A SUA FOTO
+       ------------------------------ */
     body {
       margin: 0;
-      min-height: 100vh;
+      min-height: 100vh;     /* fallback */
+      min-height: 100dvh;    /* corrige viewport em mobile */
       background-color: #ffffff;
       background-image: url("IMG_20250823_124847408.jpg");
-      background-size: contain;           /* mostra a imagem inteira */
-      background-position: center center; /* centraliza */
+      background-size: contain;
+      background-position: center center;
       background-repeat: no-repeat;
+
+      /* Alinha o CARD no centro da tela (horizontal e vertical) */
       display: grid;
       place-items: center;
+
       padding: 20px;
-      font-family: sans-serif;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
     }
 
-    /* Caixa para deixar texto legível sobre a foto */
+    /* ------------------------------
+       CARD (CONTAINER DO CONTEÚDO)
+       ------------------------------ */
     .card {
       width: min(900px, 96vw);
-      background: rgba(0,0,0,0.45);
+      background: var(--card-bg);
       color: #fff;
-      padding: 28px 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+
+      padding: 28px 24px;
       border-radius: 16px;
       text-align: center;
       backdrop-filter: blur(2px);
       box-shadow: 0 10px 30px rgba(0,0,0,0.25);
     }
 
-    h1 { margin: 0 0 12px; font-size: 28px; text-shadow: 0 1px 2px rgba(0,0,0,.55); }
+    /* TÍTULO */
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.2;
+      text-shadow: 0 1px 2px rgba(0,0,0,.55);
+    }
 
-    /* ===== Efeito de digitação (coração → letra) ===== */
+    /* ------------------------------
+       PARÁGRAFO COM EFEITO DE DIGITAÇÃO
+       ------------------------------ */
     .typing{
       font-size: 18px;
-      line-height: 1.6;
+      line-height: 1.7;
       color:#fff;
-      text-align:center;
+
+      /* leitura confortável (alinhado à esquerda),
+         bloco centralizado dentro do card */
+      text-align: left;
+      max-width: 760px;
+      margin: 0 auto;
+
       border-right: 2px solid rgba(255,255,255,.9);
       animation: blink-caret .75s step-end infinite;
-      white-space: pre-wrap;   /* respeita \n */
-      margin: 0 0 24px;
+      white-space: pre-wrap;     /* respeita \n */
+      overflow-wrap: anywhere;   /* evita overflows em telas estreitas */
       text-shadow: 0 1px 2px rgba(0,0,0,.55);
     }
     @keyframes blink-caret { 50% { border-color: transparent; } }
 
+    /* ------------------------------
+       BOTÃO
+       ------------------------------ */
     .btn {
       padding: 12px 22px;
       font-size: 16px;
@@ -57,11 +93,25 @@
       color: #fff;
       cursor: pointer;
       transition: transform .15s ease, filter .15s ease;
+      align-self: center;
     }
     .btn:active { transform: scale(0.98); }
     .btn:hover  { filter: brightness(1.05); }
 
     audio { display:none; }
+
+    /* ------------------------------
+       RESPONSIVIDADE
+       ------------------------------ */
+    @media (max-width: 560px){
+      .card { padding: 22px 16px; gap: 14px; }
+      h1    { font-size: 24px; }
+      .typing{ font-size: 17px; line-height: 1.6; max-width: 92%; }
+    }
+    @media (max-width: 360px){
+      h1    { font-size: 22px; }
+      .typing{ font-size: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -69,7 +119,7 @@
     <h1>Por que eu quero uma chance? 💖</h1>
 
     <!-- O texto será digitado com o efeito -->
-    <p id="textoDigitado" class="typing"></p>
+    <p id="textoDigitado" class="typing" aria-live="polite"></p>
 
     <button class="btn" onclick="retornar()">Retornar</button>
   </div>
@@ -80,7 +130,7 @@
   <script>
     function retornar(){ window.location.href = "index.html"; }
 
-    /* ===== Tentativa de autoplay amigável ===== */
+    /* Autoplay amigável do áudio */
     window.addEventListener("load", () => {
       const a = document.getElementById("bgm");
       a.volume = 0.6;
@@ -92,25 +142,33 @@
       window.addEventListener("focus", tryPlay);
     });
 
-    /* ===== TEXTO EXATO ===== */
+    /* ===== TEXTO ===== */
     const texto =
-`Você é empática, atenciosa e trabalhadora… daquelas mulheres raras que já pararam de fabricar. Uma verdadeira edição limitada. Além de educada e de boa família, dá para perceber que carrega valores que hoje são difíceis de encontrar.
-
-Mesmo sendo brava rsrs, continua sendo uma pessoa incrível, daquelas que fazem bem só por estar perto. E ainda tem o coração palmeirense.
-
-E olha… nem comecei a falar da sua beleza, do seu sorriso e do seu jeitinho doce.
-
-Com tudo isso, só me resta pedir uma chance… pra te mostrar que você merece alguém que enxergue e valorize cada uma dessas qualidades e muito mais.`;
+`Tem pessoas que a gente conhece e logo sente:
+“Essa aí é diferente.”
+E você é.
+Empática, cativante, honesta, atenciosa, trabalhadora...
+Daquelas mulheres raras que a vida não fabrica mais — uma verdadeira edição limitada.
+Além de educada e de boa família, dá pra ver de longe que você carrega valores que hoje são raridade.
+Mesmo quando faz cara de brava (rs), continua sendo uma daquelas pessoas que fazem bem só por estarem por perto.
+E como se tudo isso não bastasse… ainda tem o coração palmeirense.
+E olha… nem comecei a falar da sua beleza, do seu sorriso, e desse seu jeitinho doce que desarma até os dias mais difíceis.
+Com tudo isso, só me resta pedir uma chance…
+Pra te mostrar com calma, com respeito e com verdade que você merece alguém que enxergue, admire e valorize cada uma dessas qualidades.
+E todas as outras que só você tem.`;
 
     const destino = document.getElementById("textoDigitado");
     let index = 0;
 
-    /* ===== 25% mais rápido (0.75x dos tempos originais) ===== */
-    const BASE_INTERVAL   = 16;  // era 21
-    const COMMA_PAUSE     = 24;  // era 32
-    const SENTENCE_PAUSE  = 50;  // era 66
-    const REVEAL_DELAY    = 118; // era 157
-    const FADE_DURATION   = 35;  // era 47
+    /* ===== VELOCIDADE 1,75× DO ORIGINAL (redução de 0,25 em relação ao 2×) =====
+       Originais: 16, 24, 50, 118, 35
+       Novos ≈ orig / 1.75 -> 9, 14, 29, 67, 20
+    */
+    const BASE_INTERVAL   = 9;   // antes (2×): 8
+    const COMMA_PAUSE     = 14;  // antes (2×): 12
+    const SENTENCE_PAUSE  = 29;  // antes (2×): 25
+    const REVEAL_DELAY    = 67;  // antes (2×): 59
+    const FADE_DURATION   = 20;  // antes (2×): 18
 
     function nextDelayFor(c){
       if (c === ',' || c === ';') return BASE_INTERVAL + COMMA_PAUSE;
@@ -120,20 +178,20 @@ Com tudo isso, só me resta pedir uma chance… pra te mostrar que você merece 
 
     function digitarSequencial(){
       if (index >= texto.length){
-        destino.style.borderRight = 'none'; // remove cursor ao final
+        destino.style.borderRight = 'none';
         return;
       }
 
       const c = texto.charAt(index);
 
-      // Espaços
+      // Espaço
       if (c === ' '){
         destino.append(' ');
         index++;
         return setTimeout(digitarSequencial, BASE_INTERVAL);
       }
 
-      // Quebras de linha
+      // Quebra de linha
       if (c === '\n'){
         destino.appendChild(document.createElement('br'));
         index++;
