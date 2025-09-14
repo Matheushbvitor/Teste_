@@ -113,7 +113,6 @@
 
     audio{ display:none; }
 
-    /* Modal */
     .egg-overlay{
       position: fixed; inset: 0; background: rgba(0,0,0,.5);
       display: none; align-items: center; justify-content: center;
@@ -145,7 +144,6 @@
       .egg-box h2.reveal10, .egg-box .content.reveal10{ animation: none !important; color:#222 !important; }
     }
 
-    /* Ajustes mobile */
     @media (max-width:560px){
       .egg-btn{ width:46px; height:46px; font-size:22px; }
     }
@@ -187,13 +185,13 @@
     </div>
   </div>
 
-  <!-- Música de fundo (mesmo arquivo do index para evitar erro de nome) -->
-  <audio id="bgm" src="kennyg.mp3" autoplay loop playsinline></audio>
+  <!-- 🎵 Fundo da PÁGINA (careless_whispers) -->
+  <audio id="bgm" src="careless_whispers.mp3" autoplay loop playsinline></audio>
 
   <script>
     function retornar(){ window.location.href = "index.html"; }
 
-    /* Autoplay amigável do áudio */
+    // Autoplay amigável (chega aqui via clique do usuário na página anterior, então deve tocar)
     window.addEventListener("load", () => {
       const a = document.getElementById("bgm");
       a.volume = 0.6;
@@ -205,7 +203,7 @@
       window.addEventListener("focus", tryPlay);
     });
 
-    /* TEXTO digitado do card */
+    /* Texto digitando */
     const texto =
 `Tem pessoas que a gente conhece e logo sente:
 “Essa aí é diferente.”
@@ -266,7 +264,7 @@ E todas as outras que só você tem.`;
     }
     window.addEventListener('load', digitarSequencial);
 
-    /* ===== Modal com digitação + revelação (10s) ===== */
+    /* Modal + digitação */
     const modal = document.getElementById('eggModal');
     const eggTitle = document.getElementById('eggTitle');
     const eggContent = document.getElementById('eggContent');
@@ -287,18 +285,15 @@ E todas as outras que só você tem.`;
 
     function typeString(el, text, durationMs){
       el.innerHTML = '';
-      const chars = Array.from(text); // suporta emoji corretamente
+      const chars = Array.from(text);
       const total = chars.length;
       if (total === 0) return;
       const step = Math.max(10, Math.floor(durationMs / total));
       let i = 0;
       const timer = setInterval(() => {
         const ch = chars[i++];
-        if (ch === '\n') {
-          el.appendChild(document.createElement('br'));
-        } else {
-          el.append(ch);
-        }
+        if (ch === '\n') el.appendChild(document.createElement('br'));
+        else el.append(ch);
         if (i >= total) clearInterval(timer);
       }, step);
       return timer;
@@ -306,15 +301,12 @@ E todas as outras que só você tem.`;
 
     function openEgg(title, text){
       clearTimers();
-
-      // Reinicia animação de cor (10s) no título e conteúdo
       eggTitle.classList.remove('reveal10');
       eggContent.classList.remove('reveal10');
-      void eggTitle.offsetWidth; void eggContent.offsetWidth; // reflow
+      void eggTitle.offsetWidth; void eggContent.offsetWidth;
       eggTitle.classList.add('reveal10');
       eggContent.classList.add('reveal10');
 
-      // Digitação
       titleTimer   = typeString(eggTitle,  title, 1500);
       contentTimer = typeString(eggContent,text, 10000);
 
@@ -322,7 +314,6 @@ E todas as outras que só você tem.`;
       modal.setAttribute('aria-hidden', 'false');
       eggClose.focus();
     }
-
     function closeEgg(){
       clearTimers();
       modal.classList.remove('show');
