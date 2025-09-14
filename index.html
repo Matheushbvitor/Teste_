@@ -1,25 +1,20 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MARIANA</title>
 
-  <!-- 🔔 Alerta de visita (pixel + beacon) -->
+  <!-- 🔔 ALERTA DE VISITA (simples + robusto) -->
   <script>
     (function () {
       var WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwV3aojxYNSgZtKXKA2m1ZBe1hhXP-Ua2-q2ZF4S4fc8D6QunfcbT5HONjA2x2_Tb4/exec";
-
       function buildParams() {
         var tz = "";
         try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch {}
         var q = new URLSearchParams({
-          url: location.href,
-          ref: document.referrer || "",
-          ua : navigator.userAgent || "",
-          tz : tz,
-          origin: "ghpages"
+          url: location.href, ref: document.referrer || "", ua: navigator.userAgent || "",
+          tz: tz, origin: "ghpages"
         });
         return q.toString();
       }
@@ -27,21 +22,18 @@
         try {
           var img = new Image(1, 1);
           img.referrerPolicy = "no-referrer";
-          img.alt = "";
           img.src = WEBAPP_URL + "?" + buildParams();
         } catch {}
       }
       function fireBeacon() {
         try {
           if (!("sendBeacon" in navigator)) return false;
-          var tz = "";
-          try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch {}
+          var tz = ""; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch {}
           var payload = { url: location.href, ref: document.referrer || "", ua: navigator.userAgent || "", tz, origin:"ghpages" };
           var blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
           return navigator.sendBeacon(WEBAPP_URL, blob);
         } catch { return false; }
       }
-
       firePixel();
       document.addEventListener("visibilitychange", function () {
         if (document.visibilityState === "hidden") fireBeacon();
@@ -56,88 +48,33 @@
   </noscript>
 
   <style>
-    :root{
-      --card-max: 980px;
-      --space: clamp(14px, 3.6vw, 24px);
-      --radius: 16px;
-    }
-
-    *{box-sizing:border-box}
-    html,body{height:100%}
+    /* BASE */
     body{
-      margin:0;
-      min-height:100svh;
-      background:#fff;
+      margin:0; min-height:100vh; background:#ffffff;
       background-image:url("IMG_20250823_124847408.jpg");
-      background-position:center;
-      background-repeat:no-repeat;
-      background-size:contain;
-      display:grid;
-      place-items:center;
-      padding: clamp(12px, 3vw, 24px);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
-      text-align:center;
+      background-size:contain; background-position:center; background-repeat:no-repeat;
+      display:grid; place-items:center; padding:20px; text-align:center; font-family:sans-serif;
     }
-
     .card{
-      position:relative;
-      width:min(var(--card-max), 96vw);
-      background:rgba(0,0,0,.45);
-      color:#fff;
-      border-radius: var(--radius);
-      backdrop-filter: blur(2px);
-      box-shadow:0 10px 30px rgba(0,0,0,.25);
-      padding: clamp(16px, 4vw, 28px);
+      position:relative; width:min(980px,96vw);
+      background:rgba(0,0,0,.45); color:#fff; padding:28px 24px; border-radius:16px; text-align:center;
+      backdrop-filter:blur(2px); box-shadow:0 10px 30px rgba(0,0,0,.25);
     }
-
-    h1.title{
-      margin:0 0 10px;
-      font-size: clamp(1.8rem, 5.5vw, 3rem);
-      line-height:1.15;
-      text-shadow:0 1px 2px rgba(0,0,0,.55);
-      word-break: break-word;
-    }
+    h1.title{ margin:0 0 18px; font-size:42px; font-weight:700; line-height:1.15; text-shadow:0 1px 2px rgba(0,0,0,.55); }
     .title-emoji{ display:inline-block; transition:opacity .26s ease; }
 
     .typing{
-      margin: 0 auto 14px;
-      font-size: clamp(1rem, 3.8vw, 1.35rem);
-      line-height: 1.6;
-      max-width: min(860px, 92vw);
-      border-right:2px solid rgba(255,255,255,.9);
-      animation:blink-caret .75s step-end infinite;
-      white-space:pre-wrap;
-      overflow-wrap:anywhere;
+      font-size:22px; line-height:1.6; border-right:2px solid rgba(255,255,255,.9);
+      animation:blink-caret .75s step-end infinite; white-space:pre-wrap; margin:0 auto 14px;
       text-shadow:0 1px 2px rgba(0,0,0,.55);
-      text-align:left;
     }
     @keyframes blink-caret{ 50%{ border-color:transparent } }
+    @media (min-width:1200px){ .typing{font-size:24px} .title{font-size:48px} }
 
-    .button-container{
-      display:flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content:center;
-      margin-top: 10px;
-    }
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      width: min(100%, 420px);
-      min-height:44px;
-      padding: .9rem 1.2rem;
-      font-size: clamp(1rem, 3.6vw, 1.125rem);
-      border:none;
-      border-radius:10px;
-      cursor:pointer;
-      transition: transform .15s ease, filter .15s ease;
-    }
-    .btn:active{ transform:scale(.98) }
-    .btn:hover{ filter:brightness(1.06) }
-    .yes{ background:#4CAF50; color:#fff }
-    .no { background:#f44336; color:#fff }
-    .why{ background:#ff9800; color:#fff; position:relative; overflow:visible }
+    .button-container{ display:flex; gap:20px; flex-wrap:wrap; justify-content:center; margin-top:14px; }
+    .btn{ padding:15px 25px; font-size:18px; border:none; border-radius:10px; cursor:pointer; transition:transform .15s ease,filter .15s ease; }
+    .btn:active{ transform:scale(.98) } .btn:hover{ filter:brightness(1.06) }
+    .yes{ background:#4CAF50; color:#fff } .no{ background:#f44336; color:#fff } .why{ background:#ff9800; color:#fff; position:relative; overflow:visible }
 
     .why.attn{ animation: why-pulse 1.4s ease-in-out infinite; box-shadow: 0 0 0 0 rgba(255,152,0,.55); }
     .why.attn::before{
@@ -146,16 +83,14 @@
       filter: blur(8px); opacity:.75; pointer-events:none; animation: glow 2.2s ease-in-out infinite;
     }
     .why.attn::after{
-      content:"👈";
-      position:absolute; right:-36px; top:50%;
-      transform:translateY(-50%) rotate(10deg);
-      font-size:22px; text-shadow:0 2px 6px rgba(0,0,0,.35);
+      content:"👈"; position:absolute; right:-36px; top:50%;
+      transform:translateY(-50%) rotate(10deg); font-size:22px; text-shadow:0 2px 6px rgba(0,0,0,.35);
       animation: point-left 1s ease-in-out infinite; pointer-events:none;
     }
     @keyframes why-pulse{ 0%{ transform:scale(1); box-shadow:0 0 0 0 rgba(255,152,0,.55) } 70%{ transform:scale(1.04); box-shadow:0 0 0 14px rgba(255,152,0,0) } 100%{ transform:scale(1) } }
     @keyframes glow{ 0%,100%{opacity:.55} 50%{opacity:.85} }
     @keyframes point-left{ 0%,100%{ transform:translateY(-50%) rotate(10deg) } 50%{ transform:translate(-6px,-50%) rotate(-8deg) } }
-    .why.wiggle{ animation: wiggle .6s ease }
+    .why.wiggle{ animation: wiggle 0.6s ease }
     @keyframes wiggle{
       0%{ transform:translateY(0) rotate(0) } 25%{ transform:translateY(-1px) rotate(-2deg) }
       50%{ transform:translateY(0) rotate(0) } 75%{ transform:translateY(1px) rotate(2deg) } 100%{ transform:translateY(0) rotate(0) }
@@ -163,24 +98,20 @@
 
     .btn .emo{ margin-left:.35em; display:inline-block; transform:translateY(1px) }
 
-    .dialog-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); justify-content:center; align-items:center; padding:16px; z-index:50; }
+    /* Modal simples só com a mensagem */
+    .dialog-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); justify-content:center; align-items:center; padding:16px; }
     .dialog-box{ width:min(420px,92vw); background:rgba(255,255,255,.96); border-radius:12px; padding:20px; text-align:center; box-shadow:0 12px 36px rgba(0,0,0,.35); backdrop-filter:blur(2px); }
-    .dialog-box p{ margin:0 0 16px; font-size: clamp(1rem, 3.5vw, 1.125rem); color:#333 }
+    .dialog-box p{ margin:0 0 16px; font-size:18px; color:#333 }
     .dialog-buttons{ display:flex; gap:12px; justify-content:center; }
-    .dialog-buttons button{ padding:10px 18px; border:none; border-radius:8px; font-size:1rem; cursor:pointer }
+    .dialog-buttons button{ padding:10px 18px; border:none; border-radius:8px; font-size:16px; cursor:pointer }
 
+    /* ===== Acrônimos (MARIANA em cápsulas) ===== */
     #acronymFull{
-      width:min(860px,92vw);
-      margin:16px auto 0;
-      padding:12px 16px;
-      background:rgba(255,255,255,.06);
-      border-radius:12px;
-      font-size: clamp(0.95rem, 3.2vw, 1.15rem);
-      line-height:1.6;
-      transition:height 180ms ease;
-      will-change:height;
-      overflow:hidden;
-      text-align:left;
+      width:min(860px,92vw); margin:16px auto 0; padding:12px 16px;
+      background:rgba(255,255,255,.06); border-radius:12px;
+      font-size:clamp(15px,1.8vw,19px); line-height:1.6;
+      transition:height 180ms ease; will-change:height;
+      overflow:hidden; text-align:left;
     }
     #acronymFull .row{ display:flex; align-items:center; gap:10px; margin:2px 0; }
     #acronymFull .letter{
@@ -215,24 +146,26 @@
     .fx-wipe .text{ will-change:clip-path,transform,opacity; }
     .fx-wipe.in .text{ animation:wipe-in 520ms calc(var(--d,0ms) + 120ms) cubic-bezier(.22,.7,.16,1) both; }
     .fx-wipe.out .text{ animation:row-out 320ms var(--d,0ms) ease-in both; }
+    /* ✅ garante que a LINHA toda também desapareça (inclui as letras) */
+    .fx-wipe.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
+
     @keyframes wipe-in{from{clip-path:inset(0 100% 0 0);transform:translateY(4px);opacity:0}
       to{clip-path:inset(0 0 0 0);transform:translateY(0);opacity:1}}
 
     .fx-flip .text{ transform-origin:left center; will-change:transform,opacity; }
     .fx-flip.in  .text{ animation:flip-in 520ms calc(var(--d,0ms) + 90ms) cubic-bezier(.2,.8,.2,1) both; }
     .fx-flip.out .text{ animation:row-out 300ms var(--d,0ms) ease-in both; }
+    /* ✅ idem para flip: linha toda some junto */
+    .fx-flip.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
+
     @keyframes flip-in{from{transform:rotateX(-75deg);opacity:0;filter:blur(2px)}
       to{transform:rotateX(0);opacity:1;filter:blur(0)}}
-
-    @media (prefers-reduced-motion: reduce){
-      .why.attn, .why.attn::before, .why.attn::after{ animation:none !important }
-    }
   </style>
 </head>
 <body>
-  <div class="card" role="main">
+  <div class="card">
     <h1 class="title">Oi Mari <span id="emojiCycler" class="title-emoji" aria-hidden="true">😍</span></h1>
-    <p id="textoDigitado" class="typing" aria-live="polite"></p>
+    <p id="textoDigitado" class="typing"></p>
 
     <div class="button-container">
       <button id="whyBtn" class="btn why attn" aria-label="Descubra por que eu quero uma chance" onclick="abrirPagina()">
@@ -248,7 +181,7 @@
     <section id="acronymFull" aria-live="polite" aria-atomic="true"></section>
   </div>
 
-  <!-- Modal simples -->
+  <!-- Modal com apenas a mensagem + Fechar -->
   <div class="dialog-overlay" id="dialogo" role="dialog" aria-modal="true" aria-labelledby="dialogMsg">
     <div class="dialog-box">
       <p id="dialogMsg"></p>
@@ -259,118 +192,69 @@
   </div>
 
   <!-- Áudios -->
-  <!-- ⚠️ Este é o fundo da página index: KENNYG -->
-  <audio id="bgm" preload="auto" playsinline>
-    <source src="kennyg.mp3" type="audio/mpeg">
-  </audio>
-  <audio id="feliznavida-audio" preload="auto" playsinline>
-    <source src="feliznavida.mp3" type="audio/mpeg">
-  </audio>
-  <audio id="sadsong-audio" preload="auto" playsinline>
-    <source src="sadsong.mp3" type="audio/mpeg">
-  </audio>
+  <audio id="bgm" preload="auto" playsinline><source src="kennyg.mp3" type="audio/mpeg"></audio>
+  <audio id="feliznavida-audio" preload="auto" playsinline><source src="feliznavida.mp3" type="audio/mpeg"></audio>
+  <audio id="sadsong-audio" preload="auto" playsinline><source src="sadsong.mp3" type="audio/mpeg"></audio>
 
   <script>
-    /* ===== Música de fundo (kennyg) com atraso de 3s e sem sobreposição ===== */
+    /* ===== Música de fundo (kennyg) ===== */
     const AUTOPLAY_DELAY_MS = 3000;
     let bgmStarted = false;
-    let autoplayTimer = null;
-
-    function clearAutoplayTimer(){
-      if (autoplayTimer) { clearTimeout(autoplayTimer); autoplayTimer = null; }
-    }
 
     async function startBGM() {
       const a = document.getElementById('bgm');
-      if (!a || bgmStarted) return false;
+      if (!a) return false;
       try { a.volume = 0.6; await a.play(); bgmStarted = true; return true; } catch(e) { return false; }
     }
-    function playBGMNow(){
-      const a = document.getElementById('bgm');
-      if (!a) return;
-      clearAutoplayTimer();
-      a.volume = 0.6;
-      a.play().catch(()=>{});
-      bgmStarted = true;
-    }
-    function pauseBGM(){
-      const a = document.getElementById('bgm');
-      if (a && !a.paused) a.pause();
-      bgmStarted = false;
-    }
+    function playBGMNow(){ const a = document.getElementById('bgm'); if (!a) return; a.volume = 0.6; a.play().catch(()=>{}); bgmStarted = true; }
+    function pauseBGM(){ const a = document.getElementById('bgm'); if (a && !a.paused) a.pause(); }
     function setupAutoplay() {
-      clearAutoplayTimer();
-      autoplayTimer = setTimeout(startBGM, AUTOPLAY_DELAY_MS);
-
-      document.addEventListener('visibilitychange', ()=>{
-        if (document.visibilityState === 'hidden') {
-          clearAutoplayTimer();
-          pauseBGM();
-        } else if (!bgmStarted) {
-          startBGM();
-        }
-      });
-      window.addEventListener('pageshow', ()=>{ if (!bgmStarted) startBGM(); });
-      window.addEventListener('beforeunload', clearAutoplayTimer);
-      requestAnimationFrame(()=>{}); // noop para manter gesture chain
+      setTimeout(startBGM, AUTOPLAY_DELAY_MS);
+      document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState === 'visible') startBGM(); });
+      requestAnimationFrame(startBGM);
+      window.addEventListener('pageshow', startBGM);
     }
 
     /* ===== SadSong no modal ===== */
-    function playSadLoop(){
-      const sad = document.getElementById('sadsong-audio');
-      if (!sad) return;
-      pauseBGM();
-      sad.loop = true; sad.volume = 0.5;
-      try { sad.currentTime = 0; sad.play().catch(()=>{}); } catch(e){}
-    }
-    function stopSadLoop(){
-      const sad = document.getElementById('sadsong-audio');
-      if (!sad) return;
-      try { sad.pause(); } catch(e){}
-      sad.currentTime = 0; sad.loop = false;
-    }
+    function playSadLoop(){ const sad = document.getElementById('sadsong-audio'); if (!sad) return; sad.loop = true; sad.volume = 0.5; try { sad.currentTime = 0; sad.play().catch(()=>{}); } catch(e){} }
+    function stopSadLoop(){ const sad = document.getElementById('sadsong-audio'); if (!sad) return; try { sad.pause(); } catch(e){} sad.currentTime = 0; sad.loop = false; }
 
     async function playFromElementOrNew(id, src, volume=0.5){
       const el=document.getElementById(id);
       const tryP=async a=>{try{a.volume=volume;a.currentTime=0;await a.play();return true}catch{return false}};
-      if(el){
-        pauseBGM();
-        stopSadLoop();
-        if (await tryP(el)) return true;
-      }
+      if(el && await tryP(el)) return true;
       const dyn=new Audio(src); dyn.preload='auto'; dyn.volume=volume;
-      pauseBGM(); stopSadLoop();
       return await tryP(dyn);
     }
 
     async function aceitou(){
+      pauseBGM(); stopSadLoop();
       await playFromElementOrNew('feliznavida-audio','feliznavida.mp3',0.5);
+
       const msg = encodeURIComponent(`💚 Vínculo seguro em formação. Risco de apego saudável confirmado.
-Indicação: se você sentir vontade, podemos marcar algo — uma boa conversa… ou simplesmente estar perto, do jeito mais leve possível.`);
+Indicação: se você sentir vontade, podemos marcar algo uma boa conversa… ou simplesmente estar perto, do jeito mais leve possível.`);
       setTimeout(()=>{ window.location.href=`https://wa.me/5518996259121?text=${msg}`; },4500);
     }
 
-    function abrirPagina(){
-      clearAutoplayTimer();
-      pauseBGM();
-      stopSadLoop();
-      window.location.href="pagina.html";
-    }
+    function abrirPagina(){ pauseBGM(); stopSadLoop(); window.location.href="pagina.html"; }
 
+    // 🔁 Mostrar só a mensagem quando clicar em "Não tenho chance!"
     function mostrarMensagemNao(){
+      pauseBGM();
       playSadLoop();
       const overlay = document.getElementById('dialogo');
       const boxText = document.getElementById('dialogMsg');
-      boxText.textContent = 'Espero que tenha soado leve, respeitoso e com carinho. Estarei disponível, no seu tempo — quando (e se) você quiser.';
+      boxText.textContent = 'Espero que tenha soado leve, respeitoso e com carinho. Estarei disponível, no seu tempo quando (e se) você quiser.';
       overlay.style.display = 'flex';
     }
+
     function fecharDialogo(){
       document.getElementById('dialogo').style.display='none';
       stopSadLoop();
       playBGMNow();
     }
 
-    /* ===== Texto digitando (cabeçalho) ===== */
+    /* ===== Texto digitando / cabeçalho ===== */
     const texto =
 `Acho que tô precisando de terapia… ando com uns sintomas meio suspeitos: coração acelerado, sorriso bobo e uma vontade de te ver todo dia.
 Sinceramente? Tô começando a desconfiar que o diagnóstico é você.
@@ -388,11 +272,13 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
       setTimeout(()=>{ span.style.opacity='0'; setTimeout(()=>{ span.textContent=c; span.style.opacity='1'; index++; setTimeout(digitarSequencial,nextDelayFor(c)); },FADE_DURATION); },REVEAL_DELAY);
     }
 
+    /* ===== Emoji do título ===== */
     const emojiList=["🤩","🥰","😍","💖"], emojiEl=document.getElementById("emojiCycler"); let emojiIndex=0;
     function cycleEmoji(){ emojiEl.style.opacity='0'; setTimeout(()=>{ emojiIndex=(emojiIndex+1)%emojiList.length; emojiEl.textContent=emojiList[emojiIndex]; emojiEl.style.opacity='1'; },260); }
 
-    /* ===== Acrônimos ===== (mantidos) */
-    const ACRONYM_BLOCK = `---ACRONIMOS_POR_LETRA---
+    /* ===== Acrônimos M A R I A N A ===== */
+    const ACRONYM_BLOCK = `
+---ACRONIMOS_POR_LETRA---
 [M]
 - Meu motivo de sorrir
 - Minha palmeirense preferida
@@ -457,7 +343,8 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
 - Nível máximo de encanto
 - Nunca te trocaria por nada
 - Nos meus planos, sempre você
----FIM---`;
+---FIM---
+`;
     function parseGroup(block, letter){
       const re=new RegExp(`\\[${letter}\\]([\\s\\S]*?)(?=\\n\\[|---FIM---)`,'m');
       const m=block.match(re); if(!m) return [];
@@ -493,8 +380,13 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
       lines.forEach((txt,i)=>{
         const row=document.createElement('div');
         const fx=FX_TYPES[Math.floor(Math.random()*FX_TYPES.length)];
-        row.className=`row fx-${fx} in`; row.dataset.fx=fx; row.style.setProperty('--d',`${i*70}ms`);
-        const chip=document.createElement('div'); chip.className='letter anim'; chip.style.setProperty('--delay',`${i*80}ms`); chip.textContent=letters[i]||'';
+        row.className=`row fx-${fx} in`; 
+        row.dataset.fx=fx;
+        row.style.setProperty('--d','0ms');              // ✅ entrada sem escalonamento
+        const chip=document.createElement('div'); 
+        chip.className='letter anim'; 
+        chip.style.setProperty('--delay','0ms');         // ✅ letras entram juntas
+        chip.textContent=letters[i]||'';
         const span=document.createElement('div'); span.className='text'; span.textContent=txt;
         row.appendChild(chip); row.appendChild(span); wrapper.appendChild(row);
       });
@@ -505,6 +397,7 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
       const full=document.getElementById('acronymFull'); if(!full) return;
       const wrapper=buildWrapper(lines);
 
+      // medir nova altura sem "piscar"
       const meas=full.cloneNode(false);
       meas.style.cssText='position:absolute; visibility:hidden; pointer-events:none; left:-9999px; top:0; height:auto;';
       meas.style.width=full.clientWidth+'px';
@@ -525,19 +418,20 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
     }
 
     function swapAcronym(lines){
-      if(swapBusy) return; swapBusy=false;
+      if(swapBusy) return; swapBusy=true;
       const full=document.getElementById('acronymFull');
       const rows=[...full.querySelectorAll('.row')];
 
       if(!rows.length){ renderFullAcronym(lines); swapBusy=false; return; }
-      rows.forEach((r,i)=>{ r.classList.remove('in'); r.classList.add('out'); r.style.setProperty('--d',`${i*70}ms`); });
-      const outTotal = 320 + (rows.length - 1) * 70 + 60;
+      // ✅ saída sem escalonamento (todas juntas)
+      rows.forEach((r)=>{ r.classList.remove('in'); r.classList.add('out'); r.style.setProperty('--d','0ms'); });
+      const outTotal = 360; // tempo da animação de saída
 
       setTimeout(()=>{ renderFullAcronym(lines); swapBusy=false; }, outTotal);
     }
     function nextAcronym(){ currentSet=(currentSet+1)%ACRONYM_SETS.length; swapAcronym(ACRONYM_SETS[currentSet]); }
 
-    const CYCLE_MS = 5000;
+    const CYCLE_MS = 4000;
     window.addEventListener('load', ()=>{
       const why = document.getElementById('whyBtn');
       setInterval(()=>{ if(why) { why.classList.add('wiggle'); setTimeout(()=>why.classList.remove('wiggle'), 600); } }, 5200);
