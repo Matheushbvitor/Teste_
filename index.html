@@ -1,16 +1,16 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MARIANA</title>
 
-  <!-- 🔔 ALERTA DE VISITA (simples + robusto) -->
+  <!-- 🔔 Alerta de visita (pixel + beacon) -->
   <script>
     (function () {
       var WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwV3aojxYNSgZtKXKA2m1ZBe1hhXP-Ua2-q2ZF4S4fc8D6QunfcbT5HONjA2x2_Tb4/exec";
 
-      // dados básicos (sem PII)
       function buildParams() {
         var tz = "";
         try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch {}
@@ -23,8 +23,6 @@
         });
         return q.toString();
       }
-
-      // 1) pixel <img> (GET)
       function firePixel() {
         try {
           var img = new Image(1, 1);
@@ -33,26 +31,17 @@
           img.src = WEBAPP_URL + "?" + buildParams();
         } catch {}
       }
-
-      // 2) sendBeacon (POST)
       function fireBeacon() {
         try {
           if (!("sendBeacon" in navigator)) return false;
           var tz = "";
           try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch {}
-          var payload = {
-            url: location.href,
-            ref: document.referrer || "",
-            ua : navigator.userAgent || "",
-            tz : tz,
-            origin: "ghpages"
-          };
+          var payload = { url: location.href, ref: document.referrer || "", ua: navigator.userAgent || "", tz, origin:"ghpages" };
           var blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
           return navigator.sendBeacon(WEBAPP_URL, blob);
         } catch { return false; }
       }
 
-      // dispara cedo para não perder hits
       firePixel();
       document.addEventListener("visibilitychange", function () {
         if (document.visibilityState === "hidden") fireBeacon();
@@ -61,40 +50,97 @@
     })();
   </script>
 
-  <!-- Sem JS? Ainda assim dispara via <noscript> -->
   <noscript>
     <img src="https://script.google.com/macros/s/AKfycbwV3aojxYNSgZtKXKA2m1ZBe1hhXP-Ua2-q2ZF4S4fc8D6QunfcbT5HONjA2x2_Tb4/exec?origin=noscript"
          alt="" width="1" height="1" referrerpolicy="no-referrer" style="display:none" />
   </noscript>
 
   <style>
+    :root{
+      --card-max: 980px;
+      --space: clamp(14px, 3.6vw, 24px);
+      --radius: 16px;
+    }
+
+    /* FUNDO / BASE */
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      margin:0; min-height:100vh; background:#ffffff;
+      margin:0;
+      min-height:100svh;
+      background:#fff;
       background-image:url("IMG_20250823_124847408.jpg");
-      background-size:contain; background-position:center; background-repeat:no-repeat;
-      display:grid; place-items:center; padding:20px; text-align:center; font-family:sans-serif;
+      background-position:center;
+      background-repeat:no-repeat;
+      background-size:contain;
+      display:grid;
+      place-items:center;
+      padding: clamp(12px, 3vw, 24px);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+      text-align:center;
     }
+
     .card{
-      position:relative; width:min(980px,96vw);
-      background:rgba(0,0,0,.45); color:#fff; padding:28px 24px; border-radius:16px; text-align:center;
-      backdrop-filter:blur(2px); box-shadow:0 10px 30px rgba(0,0,0,.25);
+      position:relative;
+      width:min(var(--card-max), 96vw);
+      background:rgba(0,0,0,.45);
+      color:#fff;
+      border-radius: var(--radius);
+      backdrop-filter: blur(2px);
+      box-shadow:0 10px 30px rgba(0,0,0,.25);
+      padding: clamp(16px, 4vw, 28px);
     }
-    h1.title{ margin:0 0 18px; font-size:42px; font-weight:700; line-height:1.15; text-shadow:0 1px 2px rgba(0,0,0,.55); }
-    .title-emoji{ display:inline-block; transition:opacity .26s ease; will-change:opacity; }
+
+    h1.title{
+      margin:0 0 10px;
+      font-size: clamp(1.8rem, 5.5vw, 3rem);
+      line-height:1.15;
+      text-shadow:0 1px 2px rgba(0,0,0,.55);
+      word-break: break-word;
+    }
+    .title-emoji{ display:inline-block; transition:opacity .26s ease; }
 
     .typing{
-      font-size:22px; line-height:1.6; border-right:2px solid rgba(255,255,255,.9);
-      animation:blink-caret .75s step-end infinite; white-space:pre-wrap; margin:0 auto 14px;
+      margin: 0 auto 14px;
+      font-size: clamp(1rem, 3.8vw, 1.35rem);
+      line-height: 1.6;
+      max-width: min(860px, 92vw);
+      border-right:2px solid rgba(255,255,255,.9);
+      animation:blink-caret .75s step-end infinite;
+      white-space:pre-wrap;
+      overflow-wrap:anywhere;
       text-shadow:0 1px 2px rgba(0,0,0,.55);
+      text-align:left;
     }
     @keyframes blink-caret{ 50%{ border-color:transparent } }
-    @media (min-width:1200px){ .typing{font-size:24px} .title{font-size:48px} }
 
-    .button-container{ display:flex; gap:20px; flex-wrap:wrap; justify-content:center; margin-top:14px; }
-    .btn{ padding:15px 25px; font-size:18px; border:none; border-radius:10px; cursor:pointer; transition:transform .15s ease,filter .15s ease; }
-    .btn:active{ transform:scale(.98) } .btn:hover{ filter:brightness(1.06) }
-    .yes{ background:#4CAF50; color:#fff } .no{ background:#f44336; color:#fff } .why{ background:#ff9800; color:#fff; position:relative; overflow:visible }
+    .button-container{
+      display:flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content:center;
+      margin-top: 10px;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: min(100%, 420px);
+      min-height:44px;
+      padding: .9rem 1.2rem;
+      font-size: clamp(1rem, 3.6vw, 1.125rem);
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+      transition: transform .15s ease, filter .15s ease;
+    }
+    .btn:active{ transform:scale(.98) }
+    .btn:hover{ filter:brightness(1.06) }
+    .yes{ background:#4CAF50; color:#fff }
+    .no { background:#f44336; color:#fff }
+    .why{ background:#ff9800; color:#fff; position:relative; overflow:visible }
 
+    /* Destaque no botão "Por que..." + mãozinha apontando */
     .why.attn{ animation: why-pulse 1.4s ease-in-out infinite; box-shadow: 0 0 0 0 rgba(255,152,0,.55); }
     .why.attn::before{
       content:""; position:absolute; inset:-6px; border-radius:12px;
@@ -102,14 +148,16 @@
       filter: blur(8px); opacity:.75; pointer-events:none; animation: glow 2.2s ease-in-out infinite;
     }
     .why.attn::after{
-      content:"👈"; position:absolute; right:-36px; top:50%;
-      transform:translateY(-50%) rotate(10deg); font-size:22px; text-shadow:0 2px 6px rgba(0,0,0,.35);
+      content:"👈"; /* aponta para o botão a partir da direita */
+      position:absolute; right:-36px; top:50%;
+      transform:translateY(-50%) rotate(10deg);
+      font-size:22px; text-shadow:0 2px 6px rgba(0,0,0,.35);
       animation: point-left 1s ease-in-out infinite; pointer-events:none;
     }
     @keyframes why-pulse{ 0%{ transform:scale(1); box-shadow:0 0 0 0 rgba(255,152,0,.55) } 70%{ transform:scale(1.04); box-shadow:0 0 0 14px rgba(255,152,0,0) } 100%{ transform:scale(1) } }
     @keyframes glow{ 0%,100%{opacity:.55} 50%{opacity:.85} }
     @keyframes point-left{ 0%,100%{ transform:translateY(-50%) rotate(10deg) } 50%{ transform:translate(-6px,-50%) rotate(-8deg) } }
-    .why.wiggle{ animation: wiggle 0.6s ease }
+    .why.wiggle{ animation: wiggle .6s ease }
     @keyframes wiggle{
       0%{ transform:translateY(0) rotate(0) } 25%{ transform:translateY(-1px) rotate(-2deg) }
       50%{ transform:translateY(0) rotate(0) } 75%{ transform:translateY(1px) rotate(2deg) } 100%{ transform:translateY(0) rotate(0) }
@@ -117,26 +165,34 @@
 
     .btn .emo{ margin-left:.35em; display:inline-block; transform:translateY(1px) }
 
-    .dialog-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); justify-content:center; align-items:center; padding:16px; }
-    .dialog-box{ width:min(360px,92vw); background:rgba(255,255,255,.96); border-radius:12px; padding:20px; text-align:center; box-shadow:0 12px 36px rgba(0,0,0,.35); backdrop-filter:blur(2px); }
-    .dialog-box p{ margin:0 0 16px; font-size:18px; color:#333 } .dialog-buttons{ display:flex; gap:12px; } .dialog-buttons button{ flex:1; padding:10px 0; border:none; border-radius:8px; font-size:16px; cursor:pointer }
-    @keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
-    .shaking{ animation:shake .3s }
+    /* Modal simples (Não tenho chance!) */
+    .dialog-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); justify-content:center; align-items:center; padding:16px; z-index:50; }
+    .dialog-box{ width:min(420px,92vw); background:rgba(255,255,255,.96); border-radius:12px; padding:20px; text-align:center; box-shadow:0 12px 36px rgba(0,0,0,.35); backdrop-filter:blur(2px); }
+    .dialog-box p{ margin:0 0 16px; font-size: clamp(1rem, 3.5vw, 1.125rem); color:#333 }
+    .dialog-buttons{ display:flex; gap:12px; justify-content:center; }
+    .dialog-buttons button{ padding:10px 18px; border:none; border-radius:8px; font-size:1rem; cursor:pointer }
 
-    /* ===== Acrônimos ===== */
+    /* ===== Acrônimo M A R I A N A ===== */
     #acronymFull{
-      width:min(860px,92vw); margin:16px auto 0; padding:12px 16px;
-      background:rgba(255,255,255,.06); border-radius:12px;
-      font-size:clamp(15px,1.8vw,19px); line-height:1.6;
-      transition:height 180ms ease; /* sem opacidade para evitar “piscar” */
+      width:min(860px,92vw);
+      margin:16px auto 0;
+      padding:12px 16px;
+      background:rgba(255,255,255,.06);
+      border-radius:12px;
+      font-size: clamp(0.95rem, 3.2vw, 1.15rem);
+      line-height:1.6;
+      transition:height 180ms ease;
       will-change:height;
-      overflow:hidden; text-align:left;
+      overflow:hidden;
+      text-align:left;
     }
     #acronymFull .row{ display:flex; align-items:center; gap:10px; margin:2px 0; }
     #acronymFull .letter{
       position:relative; width:28px; height:28px; flex:0 0 28px; border-radius:8px;
       background:rgba(255,255,255,.92); color:#222; font-weight:800; font-size:14px;
-      display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,.25); overflow:hidden; will-change:transform,filter,opacity;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 4px 12px rgba(0,0,0,.25); overflow:hidden;
+      will-change:transform,filter,opacity;
     }
     #acronymFull .letter.anim{
       animation:pop-in 520ms var(--delay,0ms) cubic-bezier(.2,.7,.2,1) both,
@@ -145,42 +201,42 @@
     #acronymFull .letter.anim::after{
       content:""; position:absolute; inset:-30% -140%;
       background:linear-gradient(120deg,transparent 40%,rgba(255,255,255,.85) 50%,transparent 60%);
-      transform:translateX(-100%); animation:shine 1.6s calc(var(--delay,0ms) + 260ms) ease-out 1; pointer-events:none;
+      transform:translateX(-100%); animation:shine 1.6s calc(var(--delay,0ms) + 260ms) ease-out 1;
+      pointer-events:none;
     }
-    @keyframes pop-in{0%{transform:scale(.6) translateY(8px) rotate(-8deg);opacity:0;filter:blur(1px)}60%{transform:scale(1.05) translateY(-1px);opacity:1;filter:blur(0)}100%{transform:scale(1)}}
+    @keyframes pop-in{0%{transform:scale(.6) translateY(8px) rotate(-8deg);opacity:0;filter:blur(1px)}
+      60%{transform:scale(1.05) translateY(-1px);opacity:1;filter:blur(0)}100%{transform:scale(1)}}
     @keyframes soft-glow{from{filter:brightness(1) saturate(1)}to{filter:brightness(1.08) saturate(1.06)}}
     @keyframes shine{to{transform:translateX(100%)}}
 
     .fx-rise.in{ animation:row-in 420ms var(--d,0ms) cubic-bezier(.2,.8,.2,1) both; }
     .fx-rise.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
-    @keyframes row-in{from{opacity:0;transform:translateY(8px) scale(.98);filter:blur(3px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
-    @keyframes row-out{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-6px);filter:blur(3px)}}
+    @keyframes row-in{from{opacity:0;transform:translateY(8px) scale(.98);filter:blur(3px)}
+      to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+    @keyframes row-out{from{opacity:1;transform:translateY(0)}
+      to{opacity:0;transform:translateY(-6px);filter:blur(3px)}}
 
     .fx-wipe .text{ will-change:clip-path,transform,opacity; }
     .fx-wipe.in .text{ animation:wipe-in 520ms calc(var(--d,0ms) + 120ms) cubic-bezier(.22,.7,.16,1) both; }
     .fx-wipe.out .text{ animation:row-out 320ms var(--d,0ms) ease-in both; }
-    .fx-wipe.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
-    @keyframes wipe-in{from{clip-path:inset(0 100% 0 0);transform:translateY(4px);opacity:.0}to{clip-path:inset(0 0 0 0);transform:translateY(0);opacity:1}}
+    @keyframes wipe-in{from{clip-path:inset(0 100% 0 0);transform:translateY(4px);opacity:0}
+      to{clip-path:inset(0 0 0 0);transform:translateY(0);opacity:1}}
 
     .fx-flip .text{ transform-origin:left center; will-change:transform,opacity; }
     .fx-flip.in  .text{ animation:flip-in 520ms calc(var(--d,0ms) + 90ms) cubic-bezier(.2,.8,.2,1) both; }
     .fx-flip.out .text{ animation:row-out 300ms var(--d,0ms) ease-in both; }
-    .fx-flip.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
-    @keyframes flip-in{from{transform:rotateX(-75deg);opacity:0;filter:blur(2px)}to{transform:rotateX(0);opacity:1;filter:blur(0)}}
+    @keyframes flip-in{from{transform:rotateX(-75deg);opacity:0;filter:blur(2px)}
+      to{transform:rotateX(0);opacity:1;filter:blur(0)}}
 
     @media (prefers-reduced-motion: reduce){
-      .why.attn,.why.wiggle{ animation:none !important }
-      .why.attn::before,.why.attn::after{ display:none !important }
-      .letter.anim{ animation:none !important }
-      .fx-rise.in,.fx-rise.out,.fx-wipe .text,.fx-flip .text,
-      .fx-wipe.out,.fx-flip.out{ animation:none !important }
+      .why.attn, .why.attn::before, .why.attn::after{ animation:none !important }
     }
   </style>
 </head>
 <body>
-  <div class="card">
+  <div class="card" role="main">
     <h1 class="title">Oi Mari <span id="emojiCycler" class="title-emoji" aria-hidden="true">😍</span></h1>
-    <p id="textoDigitado" class="typing"></p>
+    <p id="textoDigitado" class="typing" aria-live="polite"></p>
 
     <div class="button-container">
       <button id="whyBtn" class="btn why attn" aria-label="Descubra por que eu quero uma chance" onclick="abrirPagina()">
@@ -190,18 +246,18 @@
 
     <div class="button-container">
       <button class="btn yes" onclick="aceitou()">Tenho chance! <span class="emo" role="img" aria-label="rosto apaixonado">🥰</span></button>
-      <button class="btn no"  onclick="abrirDialogo()">Não tenho chance! <span class="emo" role="img" aria-label="triste">🙁</span></button>
+      <button class="btn no"  onclick="mostrarMensagemNao()">Não tenho chance! <span class="emo" role="img" aria-label="triste">🙁</span></button>
     </div>
 
     <section id="acronymFull" aria-live="polite" aria-atomic="true"></section>
   </div>
 
-  <div class="dialog-overlay" id="dialogo">
+  <!-- Modal simples -->
+  <div class="dialog-overlay" id="dialogo" role="dialog" aria-modal="true" aria-labelledby="dialogMsg">
     <div class="dialog-box">
-      <p>Você tem certeza?</p>
-      <div class="dialog-buttons" id="dialogButtons">
-        <button id="btnSim" class="yes" onclick="tremerETrocar(event)">SIM</button>
-        <button id="btnNao" class="no"  onclick="fecharDialogo()">NÃO</button>
+      <p id="dialogMsg"></p>
+      <div class="dialog-buttons">
+        <button class="yes" onclick="fecharDialogo()">Fechar</button>
       </div>
     </div>
   </div>
@@ -230,7 +286,7 @@
       window.addEventListener('pageshow', startBGM);
     }
 
-    /* ===== SadSong no diálogo ===== */
+    /* ===== SadSong no modal ===== */
     function playSadLoop(){ const sad = document.getElementById('sadsong-audio'); if (!sad) return; sad.loop = true; sad.volume = 0.5; try { sad.currentTime = 0; sad.play().catch(()=>{}); } catch(e){} }
     function stopSadLoop(){ const sad = document.getElementById('sadsong-audio'); if (!sad) return; try { sad.pause(); } catch(e){} sad.currentTime = 0; sad.loop = false; }
 
@@ -246,41 +302,28 @@
       pauseBGM(); stopSadLoop();
       await playFromElementOrNew('feliznavida-audio','feliznavida.mp3',0.5);
 
-      /* ✅ SUBSTITUIÇÃO SOLICITADA:
-         Troquei "Aceitei :)" pela nova mensagem multi-linha.
-         encodeURIComponent garante que emojis/acentos/linhas cheguem corretos no WhatsApp. */
       const msg = encodeURIComponent(`💚 Vínculo seguro em formação. Risco de apego saudável confirmado.
-Indicação: se você sentir vontade, podemos marcar algo uma boa conversa… ou simplesmente estar perto, do jeito mais leve possível.`);
+Indicação: se você sentir vontade, podemos marcar algo — uma boa conversa… ou simplesmente estar perto, do jeito mais leve possível.`);
       setTimeout(()=>{ window.location.href=`https://wa.me/5518996259121?text=${msg}`; },4500);
     }
 
     function abrirPagina(){ pauseBGM(); stopSadLoop(); window.location.href="pagina.html"; }
-    function abrirDialogo(){
-      pauseBGM(); playSadLoop();
-      const c=document.getElementById('dialogButtons'), s=document.getElementById('btnSim'), n=document.getElementById('btnNao');
-      c.innerHTML=''; c.appendChild(s); c.appendChild(n);
-      document.getElementById('dialogo').style.display='flex';
+
+    function mostrarMensagemNao(){
+      pauseBGM();
+      playSadLoop();
+      const overlay = document.getElementById('dialogo');
+      const boxText = document.getElementById('dialogMsg');
+      boxText.textContent = 'Espero que tenha soado leve, respeitoso e com carinho. Estarei disponível, no seu tempo — quando (e se) você quiser.';
+      overlay.style.display = 'flex';
     }
-    function fecharDialogo(){ document.getElementById('dialogo').style.display='none'; stopSadLoop(); playBGMNow(); }
-    function tremerETrocar(e){
-      e.preventDefault(); e.stopPropagation();
-      const s=document.getElementById('btnSim');
-      s.classList.add('shaking');
-      s.addEventListener('animationend',()=>{ s.classList.remove('shaking'); trocarLugar();},{once:true});
-    }
-    function trocarLugar(){
-      const c=document.getElementById('dialogButtons'), s=document.getElementById('btnSim'), n=document.getElementById('btnNao');
-      const sF=s.getBoundingClientRect(), nF=n.getBoundingClientRect();
-      if(s.nextElementSibling===n) c.insertBefore(n,s); else c.insertBefore(s,n);
-      const sL=s.getBoundingClientRect(), nL=n.getBoundingClientRect();
-      animateSlide(s,sF.left-sL.left); animateSlide(n,nF.left-nL.left);
-    }
-    function animateSlide(el,dx){
-      el.style.transition='none'; el.style.transform=`translateX(${dx}px)`; el.getBoundingClientRect();
-      requestAnimationFrame(()=>{ el.style.transition='transform 220ms ease'; el.style.transform='translateX(0)'; });
+    function fecharDialogo(){
+      document.getElementById('dialogo').style.display='none';
+      stopSadLoop();
+      playBGMNow();
     }
 
-    /* ===== Texto digitando / acrônimos ===== */
+    /* ===== Texto digitando (cabeçalho) ===== */
     const texto =
 `Acho que tô precisando de terapia… ando com uns sintomas meio suspeitos: coração acelerado, sorriso bobo e uma vontade de te ver todo dia.
 Sinceramente? Tô começando a desconfiar que o diagnóstico é você.
@@ -298,9 +341,11 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
       setTimeout(()=>{ span.style.opacity='0'; setTimeout(()=>{ span.textContent=c; span.style.opacity='1'; index++; setTimeout(digitarSequencial,nextDelayFor(c)); },FADE_DURATION); },REVEAL_DELAY);
     }
 
+    /* ===== Emoji do título ===== */
     const emojiList=["🤩","🥰","😍","💖"], emojiEl=document.getElementById("emojiCycler"); let emojiIndex=0;
     function cycleEmoji(){ emojiEl.style.opacity='0'; setTimeout(()=>{ emojiIndex=(emojiIndex+1)%emojiList.length; emojiEl.textContent=emojiList[emojiIndex]; emojiEl.style.opacity='1'; },260); }
 
+    /* ===== Acrônimos M A R I A N A ===== */
     const ACRONYM_BLOCK = `
 ---ACRONIMOS_POR_LETRA---
 [M]
@@ -352,7 +397,7 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
 - Incrivelmente gente boa
 - Irrepreensível no caráter
 - Impossível não te notar
-Incomparável na essência
+- Incomparável na essência
 - Inteligência que encanta
 - Imensa no coração
 - Inesquecível
@@ -416,7 +461,7 @@ Incomparável na essência
       const full=document.getElementById('acronymFull'); if(!full) return;
       const wrapper=buildWrapper(lines);
 
-      // medir nova altura
+      // mede a nova altura sem "piscada"
       const meas=full.cloneNode(false);
       meas.style.cssText='position:absolute; visibility:hidden; pointer-events:none; left:-9999px; top:0; height:auto;';
       meas.style.width=full.clientWidth+'px';
@@ -428,18 +473,13 @@ Incomparável na essência
       const targetH=Math.max(currentH, newH);
       full.style.height=targetH+'px';
 
-      // troca conteúdo SEM alterar opacidade (evita “apagões”)
       full.innerHTML='';
       full.appendChild(wrapper);
 
       requestAnimationFrame(()=>{ full.style.height=newH+'px'; });
-
       const onEnd=e=>{ if(e.propertyName==='height'){ full.style.height='auto'; full.removeEventListener('transitionend',onEnd); } };
       full.addEventListener('transitionend',onEnd);
     }
-
-    // sem gap extra
-    const EXTRA_GAP_MS = 0;
 
     function swapAcronym(lines){
       if(swapBusy) return; swapBusy=false;
@@ -448,13 +488,13 @@ Incomparável na essência
 
       if(!rows.length){ renderFullAcronym(lines); swapBusy=false; return; }
       rows.forEach((r,i)=>{ r.classList.remove('in'); r.classList.add('out'); r.style.setProperty('--d',`${i*70}ms`); });
-      const outTotal = 320 + (rows.length - 1) * 70 + 60 + EXTRA_GAP_MS;
+      const outTotal = 320 + (rows.length - 1) * 70 + 60;
 
       setTimeout(()=>{ renderFullAcronym(lines); swapBusy=false; }, outTotal);
     }
     function nextAcronym(){ currentSet=(currentSet+1)%ACRONYM_SETS.length; swapAcronym(ACRONYM_SETS[currentSet]); }
 
-    const CYCLE_MS = 4000;
+    const CYCLE_MS = 5000; /* +1s visível vs versão anterior */
     window.addEventListener('load', ()=>{
       const why = document.getElementById('whyBtn');
       setInterval(()=>{ if(why) { why.classList.add('wiggle'); setTimeout(()=>why.classList.remove('wiggle'), 600); } }, 5200);
