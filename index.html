@@ -158,14 +158,12 @@
 
     .fx-wipe .text{ will-change:clip-path,transform,opacity; }
     .fx-wipe.in .text{ animation:wipe-in 520ms calc(var(--d,0ms) + 120ms) cubic-bezier(.22,.7,.16,1) both; }
-    /* 🔧 FIX: na saída o TEXTO sai junto com a LINHA, evitando “letra sozinha” */
     .fx-wipe.out .text{ animation:row-out 320ms var(--d,0ms) ease-in both; }
     .fx-wipe.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
     @keyframes wipe-in{from{clip-path:inset(0 100% 0 0);transform:translateY(4px);opacity:.0}to{clip-path:inset(0 0 0 0);transform:translateY(0);opacity:1}}
 
     .fx-flip .text{ transform-origin:left center; will-change:transform,opacity; }
     .fx-flip.in  .text{ animation:flip-in 520ms calc(var(--d,0ms) + 90ms) cubic-bezier(.2,.8,.2,1) both; }
-    /* 🔧 FIX: idem para flip */
     .fx-flip.out .text{ animation:row-out 300ms var(--d,0ms) ease-in both; }
     .fx-flip.out{ animation:row-out 320ms var(--d,0ms) ease-in both; }
     @keyframes flip-in{from{transform:rotateX(-75deg);opacity:0;filter:blur(2px)}to{transform:rotateX(0);opacity:1;filter:blur(0)}}
@@ -247,8 +245,15 @@
     async function aceitou(){
       pauseBGM(); stopSadLoop();
       await playFromElementOrNew('feliznavida-audio','feliznavida.mp3',0.5);
-      setTimeout(()=>{ const msg=encodeURIComponent("Aceitei :)"); window.location.href=`https://wa.me/5518996259121?text=${msg}`; },4500);
+
+      /* ✅ SUBSTITUIÇÃO SOLICITADA:
+         Troquei "Aceitei :)" pela nova mensagem multi-linha.
+         encodeURIComponent garante que emojis/acentos/linhas cheguem corretos no WhatsApp. */
+      const msg = encodeURIComponent(`💚 Vínculo seguro em formação. Risco de apego saudável confirmado.
+Indicação: se você sentir vontade, podemos marcar algo uma boa conversa… ou simplesmente estar perto, do jeito mais leve possível.`);
+      setTimeout(()=>{ window.location.href=`https://wa.me/5518996259121?text=${msg}`; },4500);
     }
+
     function abrirPagina(){ pauseBGM(); stopSadLoop(); window.location.href="pagina.html"; }
     function abrirDialogo(){
       pauseBGM(); playSadLoop();
@@ -437,7 +442,7 @@ Incomparável na essência
     const EXTRA_GAP_MS = 0;
 
     function swapAcronym(lines){
-      if(swapBusy) return; swapBusy=true;
+      if(swapBusy) return; swapBusy=false;
       const full=document.getElementById('acronymFull');
       const rows=[...full.querySelectorAll('.row')];
 
