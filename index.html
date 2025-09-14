@@ -57,31 +57,34 @@
     *, *::before, *::after { box-sizing: border-box; }
     :root { --card-bg: rgba(0,0,0,.55); --radius: 20px; }
 
-    /* ===== FUNDO ===== */
+    /* ===== CENA / LAYOUT ===== */
+    html, body { height: 100%; }
     body{
       margin:0;
-      min-height:100svh;
-      background:#000; /* base escura combina com o overlay e “sumir” as bordas no contain */
-      background-image:url("IMG_20250823_124847408.jpg");
-      background-size:cover;           /* desktop e telas grandes: mantém cover */
-      background-position:center;
-      background-repeat:no-repeat;
-      display:grid;
-      place-items:center;
+      min-height:100svh;              /* viewport “estável” no mobile */
+      background:#000;                /* bordas discretas quando a imagem não cobre tudo */
+      display:grid; place-items:center;  /* mantém o card centralizado como antes */
       padding: clamp(12px, 3vw, 24px);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
       text-align:center;
     }
 
-    /* 🟡 AJUSTE PEDIDO: no mobile, usar contain para “afastar” a imagem e enquadrar a Mari */
-    @media (max-width: 768px){
-      body{
-        background-size: contain;      /* mostra a foto inteira */
-        background-position: top center; /* você pode trocar p/ center 10% se quiser */
-        /* background-color já é #000 acima; bordas ficam discretas */
-      }
+    /* 🔎 Imagem fixa ao fundo, SEM cortar, sempre inteira na tela */
+    .bg-fit{
+      position: fixed;
+      left:50%; top:50%;
+      transform: translate(-50%, -50%);
+      width:100vw; height:100svh;     /* exatamente o retângulo vermelho do print */
+      object-fit: contain;            /* mostra a foto inteira */
+      object-position: center center; /* ajuste fino se quiser (ex.: center 30%) */
+      z-index:-1;
+      pointer-events:none;            /* não bloqueia cliques nos botões */
+      user-select:none;
+      -webkit-user-drag: none;
+      background:#000;                /* preenche faixas laterais/superiores se houver */
     }
 
+    /* ===== CARD ===== */
     .card{
       width: min(600px, 94vw);
       background: var(--card-bg);
@@ -97,7 +100,12 @@
       box-shadow: 0 10px 30px rgba(0,0,0,.25);
     }
 
-    h1{ margin:0; font-size: clamp(1.6rem, 4.8vw, 2.2rem); line-height:1.2; text-shadow:0 1px 2px rgba(0,0,0,.55); }
+    h1{
+      margin:0;
+      font-size: clamp(1.6rem, 4.8vw, 2.2rem);
+      line-height:1.2;
+      text-shadow:0 1px 2px rgba(0,0,0,.55);
+    }
 
     .typing{
       font-size: clamp(1rem, 3.6vw, 1.2rem);
@@ -134,12 +142,13 @@
     }
     .btn:active{ transform:scale(.98); }
     .btn:hover{ filter:brightness(1.05); }
-
-    /* (restante dos estilos que você já tinha podem continuar abaixo) */
   </style>
 </head>
 
 <body>
+  <!-- 📷 Foto inteira enquadrada no viewport -->
+  <img class="bg-fit" src="IMG_20250823_124847408.jpg" alt="Fundo" />
+
   <main class="card">
     <h1>Oi Mari</h1>
     <p class="typing">
