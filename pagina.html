@@ -1,93 +1,94 @@
+<!-- pagina.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Por que eu quero uma chance?</title>
   <style>
-    /* RESET E BASE */
     *, *::before, *::after { box-sizing: border-box; }
-    :root { --card-bg: rgba(0,0,0,.55); }
+    :root { --card-bg: rgba(0,0,0,.55); --radius:16px; }
 
-    /* FUNDO */
-    body {
-      margin: 0;
-      min-height: 100vh;
-      min-height: 100dvh;
-      background-color: #ffffff;
-      background-image: url("IMG_20250823_124847408.jpg");
-      background-size: contain;
-      background-position: center center;
-      background-repeat: no-repeat;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+    body{
+      margin:0;
+      min-height:100svh;
+      background:#ffffff;
+      background-image:url("IMG_20250823_124847408.jpg");
+      background-size:contain;
+      background-position:center;
+      background-repeat:no-repeat;
+      display:grid;
+      place-items:center;
+      padding: clamp(12px, 3vw, 24px);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
     }
 
-    /* CARD */
-    .card {
+    .card{
       width: min(900px, 96vw);
       background: var(--card-bg);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      padding: 28px 24px;
-      border-radius: 16px;
-      text-align: center;
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: clamp(12px, 2.8vw, 16px);
+      padding: clamp(16px,4vw,28px);
+      border-radius: var(--radius);
+      text-align:center;
       backdrop-filter: blur(2px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
     }
 
-    h1 { margin: 0; font-size: 28px; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,.55); }
+    h1{ margin:0; font-size: clamp(1.6rem, 4.8vw, 2.6rem); line-height:1.2; text-shadow:0 1px 2px rgba(0,0,0,.55); }
 
-    /* TEXTO DIGITANDO DO CARD (sem mudanças) */
     .typing{
-      font-size: 18px; line-height: 1.7; color:#fff;
-      text-align: left; max-width: 760px; margin: 0 auto;
+      font-size: clamp(1rem, 3.6vw, 1.2rem);
+      line-height: 1.7;
+      color:#fff;
+      text-align:left;
+      max-width: min(760px, 92vw);
+      margin: 0 auto;
       border-right: 2px solid rgba(255,255,255,.9);
       animation: blink-caret .75s step-end infinite;
-      white-space: pre-wrap; overflow-wrap: anywhere; text-shadow: 0 1px 2px rgba(0,0,0,.55);
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      text-shadow: 0 1px 2px rgba(0,0,0,.55);
     }
     @keyframes blink-caret { 50% { border-color: transparent; } }
 
-    /* AÇÕES (🧠 | Retornar | 📚) */
     .actions{
-      display: grid;
+      display:grid;
       grid-template-columns: 1fr auto 1fr;
-      align-items: center;
+      align-items:center;
       gap: 12px;
-      width: 100%;
-      max-width: 760px;
-      margin-top: 8px;
+      width:100%;
+      max-width:min(760px, 92vw);
+      margin-top: 6px;
     }
-
     .btn{
-      padding: 12px 22px; font-size: 16px; border: none; border-radius: 10px;
-      background: #4CAF50; color:#fff; cursor: pointer;
+      padding:.85rem 1.1rem;
+      font-size: clamp(1rem, 3.4vw, 1.125rem);
+      border:none; border-radius:10px;
+      background:#4CAF50; color:#fff; cursor:pointer;
       transition: transform .15s ease, filter .15s ease;
-      justify-self: center;
+      justify-self:center;
+      min-height:44px;
     }
-    .btn:active{ transform: scale(.98); }
-    .btn:hover { filter: brightness(1.05); }
+    .btn:active{ transform:scale(.98); }
+    .btn:hover{ filter:brightness(1.05); }
 
-    /* EASTER EGGS — CHAMATIVOS (sem órbita) */
     .egg-btn{
-      position: relative; isolation: isolate;
-      width: 52px; height: 52px;
+      position:relative; isolation:isolate;
+      width:52px; height:52px;
       display:flex; align-items:center; justify-content:center;
-      font-size: 26px; line-height: 1;
-      border-radius: 999px;
+      font-size:26px; line-height:1;
+      border-radius:999px;
       background: radial-gradient(120% 120% at 30% 30%, #ffffff, #f6f6f6 70%);
       color:#222;
       box-shadow: 0 10px 24px rgba(0,0,0,.28), 0 0 0 2px rgba(0,0,0,.06);
-      border: 1px solid rgba(0,0,0,.08);
-      cursor: pointer;
-      backdrop-filter: blur(4px);
+      border:1px solid rgba(0,0,0,.08);
+      cursor:pointer; backdrop-filter: blur(4px);
       transition: transform .15s ease, box-shadow .15s ease;
-      user-select: none;
+      user-select:none;
     }
     .egg-btn:hover{ transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,0,0,.3); }
     .egg-brain{ --accent: rgba(255,106,162,.45); }
@@ -104,24 +105,15 @@
       animation: egg-ring 2.1s ease-out infinite;
     }
     .egg-btn.attn::after{ animation-delay: .9s; opacity:.25; }
+    @keyframes egg-pulse{ 0%{transform:scale(1)} 50%{transform:scale(1.12)} 100%{transform:scale(1)} }
+    @keyframes egg-ring{ 0%{ box-shadow:0 0 0 0 var(--accent); opacity:.35; transform:scale(.85) } 70%{ opacity:0 } 100%{ box-shadow:0 0 0 26px rgba(0,0,0,0); transform:scale(1.4) } }
 
-    @keyframes egg-pulse{
-      0%{transform:scale(1)}
-      50%{transform:scale(1.12)}
-      100%{transform:scale(1)}
-    }
-    @keyframes egg-ring{
-      0%  { box-shadow: 0 0 0 0 var(--accent); opacity:.35; transform:scale(.85); }
-      70% { opacity:0; }
-      100%{ box-shadow: 0 0 0 26px rgba(0,0,0,0); transform:scale(1.4); }
-    }
+    .egg-left{ justify-self:start; }
+    .egg-right{ justify-self:end; }
 
-    .egg-left  { justify-self: start; }
-    .egg-right { justify-self: end; }
+    audio{ display:none; }
 
-    audio { display:none; }
-
-    /* MODAL */
+    /* Modal */
     .egg-overlay{
       position: fixed; inset: 0; background: rgba(0,0,0,.5);
       display: none; align-items: center; justify-content: center;
@@ -135,48 +127,27 @@
       border-radius: 14px; box-shadow: 0 16px 40px rgba(0,0,0,.35);
       padding: 20px 18px 16px; text-align: left;
     }
-
-    /* Título do modal com revelação de cor (10s) */
     .egg-box h2{
-      margin: 0 0 10px; font-size: 20px;
+      margin: 0 0 10px; font-size: clamp(1.05rem, 3.8vw, 1.25rem);
       color:#222;
     }
-    .egg-box h2.reveal10{
-      animation: revealColor10 10s ease forwards;
-    }
-
-    /* Conteúdo do modal + efeito de revelação da cor (10s) */
+    .egg-box h2.reveal10{ animation: revealColor10 10s ease forwards; }
     .egg-box .content{
-      white-space: pre-wrap; line-height: 1.6; font-size: 16px; color:#222;
-      min-height: 1em; /* evita “salto” antes de digitar */
+      white-space: pre-wrap; line-height: 1.6; font-size: clamp(1rem, 3.4vw, 1.1rem); color:#222; min-height:1em;
     }
-    .egg-box .content.reveal10{
-      animation: revealColor10 10s ease forwards; /* ← 10s */
-    }
-    @keyframes revealColor10{
-      from { color: #fff; }   /* começa branco */
-      to   { color: #222; }   /* termina escuro/preto */
-    }
+    .egg-box .content.reveal10{ animation: revealColor10 10s ease forwards; }
+    @keyframes revealColor10{ from{ color:#fff } to{ color:#222 } }
 
     .egg-actions{ display:flex; justify-content:flex-end; margin-top: 14px; }
 
-    /* Redução de movimento */
     @media (prefers-reduced-motion: reduce){
-      .egg-btn.attn, .egg-btn.attn::before, .egg-btn.attn::after{ animation: none !important; }
+      .egg-btn.attn, .egg-btn.attn::before, .egg-btn.attn::after,
       .egg-box h2.reveal10, .egg-box .content.reveal10{ animation: none !important; color:#222 !important; }
     }
 
-    /* RESPONSIVO */
-    @media (max-width: 560px){
-      .card { padding: 22px 16px; gap: 14px; }
-      h1    { font-size: 24px; }
-      .typing{ font-size: 17px; line-height: 1.6; max-width: 92%; }
-      .actions{ max-width: 92%; }
+    /* Ajustes mobile */
+    @media (max-width:560px){
       .egg-btn{ width:46px; height:46px; font-size:22px; }
-    }
-    @media (max-width: 360px){
-      h1    { font-size: 22px; }
-      .typing{ font-size: 16px; }
     }
   </style>
 </head>
@@ -205,7 +176,7 @@
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- Modal dos easter eggs -->
   <div id="eggModal" class="egg-overlay" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="egg-box" role="document">
       <h2 id="eggTitle">Título</h2>
@@ -216,8 +187,8 @@
     </div>
   </div>
 
-  <!-- Música -->
-  <audio id="bgm" src="careless_whispers.mp3" autoplay loop playsinline></audio>
+  <!-- Música de fundo (mesmo arquivo do index para evitar erro de nome) -->
+  <audio id="bgm" src="kennyg.mp3" autoplay loop playsinline></audio>
 
   <script>
     function retornar(){ window.location.href = "index.html"; }
@@ -234,7 +205,7 @@
       window.addEventListener("focus", tryPlay);
     });
 
-    /* TEXTO do CARD (sem mudanças) */
+    /* TEXTO digitado do card */
     const texto =
 `Tem pessoas que a gente conhece e logo sente:
 “Essa aí é diferente.”
@@ -251,7 +222,6 @@ E todas as outras que só você tem.`;
 
     const destino = document.getElementById("textoDigitado");
     let index = 0;
-
     const BASE_INTERVAL   = 9;
     const COMMA_PAUSE     = 14;
     const SENTENCE_PAUSE  = 29;
@@ -263,7 +233,6 @@ E todas as outras que só você tem.`;
       if ('.!?…'.includes(c))     return BASE_INTERVAL + SENTENCE_PAUSE;
       return BASE_INTERVAL;
     }
-
     function digitarSequencial(){
       if (index >= texto.length){
         destino.style.borderRight = 'none';
@@ -297,7 +266,7 @@ E todas as outras que só você tem.`;
     }
     window.addEventListener('load', digitarSequencial);
 
-    /* ===== MODAL COM DIGITAÇÃO + REVELAÇÃO (10s) ===== */
+    /* ===== Modal com digitação + revelação (10s) ===== */
     const modal = document.getElementById('eggModal');
     const eggTitle = document.getElementById('eggTitle');
     const eggContent = document.getElementById('eggContent');
@@ -306,7 +275,7 @@ E todas as outras que só você tem.`;
     const BRAIN_TITLE = '🧠 Vamos analisar esse caso clínico...';
     const BRAIN_TEXT  = 'Paciente apresenta sintomas de apego progressivo, pensamento acelerado, sorriso involuntário, e comportamento de admiração. Diagnóstico provável: envolvimento afetivo crônico não resolvido.';
 
-    const DICT_TITLE = '📚 Palavra do dia: “Mari”';
+    const DICT_TITLE = '📚 Palavra do dia: “Mariana”';
     const DICT_TEXT  = 'Substantivo feminino. Unidade de medida para tudo que faz bem, inspira paz, e melhora o humor de alguém chamado Matheus.';
 
     let titleTimer = null, contentTimer = null;
@@ -338,17 +307,14 @@ E todas as outras que só você tem.`;
     function openEgg(title, text){
       clearTimers();
 
-      /* Reinicia animação de cor (10s) no título e conteúdo */
+      // Reinicia animação de cor (10s) no título e conteúdo
       eggTitle.classList.remove('reveal10');
       eggContent.classList.remove('reveal10');
       void eggTitle.offsetWidth; void eggContent.offsetWidth; // reflow
       eggTitle.classList.add('reveal10');
       eggContent.classList.add('reveal10');
 
-      /* Digitação:
-         - título: ~1.5s para não “segurar” a leitura
-         - conteúdo: 10s completo conforme pedido
-      */
+      // Digitação
       titleTimer   = typeString(eggTitle,  title, 1500);
       contentTimer = typeString(eggContent,text, 10000);
 
