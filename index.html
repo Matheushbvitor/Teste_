@@ -69,7 +69,7 @@
       position:relative;
       min-height:100svh;
       display:grid;
-      place-items:center;       /* garante o card exatamente no centro */
+      place-items:center;       /* centraliza o bloco .stack no viewport */
       padding:clamp(16px,4vw,32px);
       overflow:hidden;
     }
@@ -82,10 +82,19 @@
     }
     .bg-photo{ background-size:contain; }
 
+    /* ===== Empilhador: card + acrônimo (um abaixo do outro) ===== */
+    .stack{
+      position:relative;
+      z-index:2;                 /* acima do fundo */
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:16px;                  /* espaço entre card e acrônimo */
+      width:100%;
+    }
+
     /* ===== CARD (blur cinza) ===== */
     .card{
-      position:relative;
-      z-index:3;                            /* acima do acrônimo */
       width:min(600px,94vw);
       background:rgba(0,0,0,.55);
       color:#fff;
@@ -160,17 +169,12 @@
     .dialog-buttons{ display:flex; gap:12px; justify-content:center; }
     .dialog-buttons button{ padding:10px 18px; border:none; border-radius:8px; font-size:16px; cursor:pointer }
 
-    /* ===== Acrônimo fora do card (sem fundo cinza) ===== */
+    /* ===== Acrônimo IMEDIATAMENTE abaixo do card, sem fundo ===== */
     #acronymFull{
-      position:absolute;
-      left:50%;
-      transform:translateX(-50%);
-      bottom:clamp(16px,6vh,40px);      /* fixo na parte de baixo da tela */
-      z-index:2;                        /* abaixo do card, acima do fundo */
       width:min(860px,92vw);
-      margin:0;                         /* remove margens extra */
-      padding:0;                        /* remove “faixa” cinza */
-      background:transparent;           /* sem fundo */
+      margin:0;                 /* sem margens externas */
+      padding:0;                /* sem “faixa” cinza */
+      background:transparent;   /* sem fundo */
       border-radius:0;
       font-size:clamp(15px,1.8vw,19px);
       line-height:1.6;
@@ -179,13 +183,15 @@
       text-shadow:0 1px 2px rgba(0,0,0,.4); /* legibilidade sobre a foto */
       transition:height 180ms ease;
       overflow:hidden;
+      z-index:2;
     }
     #acronymFull .row{ display:flex; align-items:center; gap:10px; margin:2px 0; }
     #acronymFull .letter{
       position:relative; width:28px; height:28px; flex:0 0 28px; border-radius:8px;
       background:rgba(255,255,255,.92); color:#222; font-weight:800; font-size:14px;
       display:flex; align-items:center; justify-content:center;
-      box-shadow:0 4px 12px rgba(0,0,0,.25); overflow:hidden;
+      box-shadow:0 4px 12px rgba(0,0,0,.25);
+      overflow:hidden;
       will-change:transform,filter,opacity;
     }
     #acronymFull .letter.anim{
@@ -232,25 +238,27 @@
       <div class="bg-photo" style="background-image: var(--hero);"></div>
     </div>
 
-    <!-- CARD centralizado -->
-    <div class="card">
-      <h1 class="title">Oi Mari <span id="emojiCycler" class="title-emoji" aria-hidden="true">😍</span></h1>
-      <p id="textoDigitado" class="typing"></p>
+    <!-- Bloco central: CARD + ACRÔNIMO -->
+    <div class="stack">
+      <div class="card">
+        <h1 class="title">Oi Mari <span id="emojiCycler" class="title-emoji" aria-hidden="true">😍</span></h1>
+        <p id="textoDigitado" class="typing"></p>
 
-      <div class="button-container">
-        <button id="whyBtn" class="btn why attn" aria-label="Descubra por que eu quero uma chance" onclick="abrirPagina()">
-          Por que eu quero uma chance? 🤔
-        </button>
+        <div class="button-container">
+          <button id="whyBtn" class="btn why attn" aria-label="Descubra por que eu quero uma chance" onclick="abrirPagina()">
+            Por que eu quero uma chance? 🤔
+          </button>
+        </div>
+
+        <div class="button-container">
+          <button class="btn yes" onclick="aceitou()">Tenho chance! <span class="emo" role="img" aria-label="rosto apaixonado">🥰</span></button>
+          <button class="btn no"  onclick="mostrarMensagemNao()">Não tenho chance! <span class="emo" role="img" aria-label="triste">🙁</span></button>
+        </div>
       </div>
 
-      <div class="button-container">
-        <button class="btn yes" onclick="aceitou()">Tenho chance! <span class="emo" role="img" aria-label="rosto apaixonado">🥰</span></button>
-        <button class="btn no"  onclick="mostrarMensagemNao()">Não tenho chance! <span class="emo" role="img" aria-label="triste">🙁</span></button>
-      </div>
+      <!-- Acrônimo imediatamente abaixo do card -->
+      <section id="acronymFull" aria-live="polite" aria-atomic="true"></section>
     </div>
-
-    <!-- Acrônimo fora do card, sem fundo -->
-    <section id="acronymFull" aria-live="polite" aria-atomic="true"></section>
   </div>
 
   <!-- Modal -->
@@ -268,7 +276,7 @@
   <audio id="feliznavida-audio" preload="auto" playsinline><source src="feliznavida.mp3" type="audio/mpeg"></source></audio>
   <audio id="sadsong-audio" preload="auto" playsinline><source src="sadsong.mp3" type="audio/mpeg"></source></audio>
 
-  <!-- ====== JS (inalterado, só mantendo tudo funcionando) ====== -->
+  <!-- ====== JS original (mantido) ====== -->
   <script>
     const AUTOPLAY_DELAY_MS = 3000;
     let bgmStarted = false;
@@ -420,7 +428,7 @@ Com todo respeito, é claro… mas será que eu teria alguma chance com você?`;
     }
     const GROUPS={ M:parseGroup(ACRONYM_BLOCK,'M'), A:parseGroup(ACRONYM_BLOCK,'A'), R:parseGroup(ACRONYM_BLOCK,'R'), I:parseGroup(ACRONYM_BLOCK,'I'), N:parseGroup(ACRONYM_BLOCK,'N') };
     function pickOne(arr,avoid){ const pool=arr.filter(x=>x!==avoid); return pool.length?pool[Math.floor(Math.random()*pool.length)]:(arr[0]||''); }
-    function pickDistinctA(aArr,used,avoid){ const pool=aArr.filter(x=>!used.has(x)&&x!==avoid); if(!pool.length){ const fb=aArr.filter(x=>x!==avoid); return fb.length?fb[Math.floor(Math.random()*fb.length)]:(aArr[0]||''); } return pool[Math.floor(Math.random()*pool.length)]; }
+    function pickDistinctA(aArr,used,avoid){ const pool=aArr.filter(x=>!used.has(x)&&x!==avoid); if(!pool.length){ const fb=aArr.filter(x=>x!==avoid); return fb.length?fb[Math.floor(Math.random()*pool.length)]:(aArr[0]||''); } return pool[Math.floor(Math.random()*pool.length)]; }
     function makeAcronymSets(count=20){
       const sets=[], lastByPos=Array(7).fill(null);
       for(let s=0;s<count;s++){
